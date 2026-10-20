@@ -11,10 +11,13 @@
   "scripts": {
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",
-    "dev": "npm run dev --workspaces --if-present",
+    "dev": "concurrently --kill-others-on-fail -n api,portal,admin -c green,cyan,magenta \"npm run dev -w @hatlanh/api\" \"npm run dev -w @hatlanh/portal\" \"npm run dev -w @hatlanh/admin\"",
     "build:shared": "npm run build -w @hatlanh/shared",
     "db:migrate": "npm run db:migrate -w @hatlanh/api",
     "db:seed": "npm run db:seed -w @hatlanh/api",
     "address:fetch": "tsx scripts/fetch-address.ts"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.5"
   }
 }

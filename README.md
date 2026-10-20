@@ -29,7 +29,7 @@ npm run dev -w @hatlanh/api
 - `@hatlanh/shared` được dùng từ thư mục `dist`, nên phải `npm run build:shared` (và chạy lại khi sửa `packages/shared`).
 - `npm run db:seed` nạp 10 sản phẩm mẫu (kèm quy cách), bài blog mẫu và tài khoản admin. Chạy lại nhiều lần vẫn an toàn.
 - Script tạo database `hat_lanh_test` chỉ chạy khi volume còn mới. Nếu thiếu, chạy `docker compose down -v` (**xóa sạch dữ liệu**) rồi `npm run db:up` và migrate/seed lại.
-- `npm run dev` ở thư mục gốc chạy `dev` của mọi workspace có script đó.
+- `npm run dev` ở thư mục gốc chạy song song API (3000), portal (3001) và admin (dùng `concurrently`). Cũng có thể chạy riêng: `npm run dev -w @hatlanh/portal`.
 
 ## Tài khoản
 - Admin: `admin@hatlanh.local`, mật khẩu lấy từ `ADMIN_PASSWORD` (mặc định `ChangeMe123!`). **Đổi mật khẩu này** trước khi dùng thật.
@@ -50,12 +50,16 @@ npm run dev -w @hatlanh/api
 | `OAUTH_MODE` | `dev` bật đăng nhập giả lập; không đặt hoặc `live` là tắt |
 | `AUTH_RATE_LIMIT` | Số lần đăng nhập/đăng ký tối đa mỗi IP mỗi phút (mặc định 10) |
 | `CORS_ORIGINS` | Các địa chỉ web được gọi API, cách nhau bằng dấu phẩy |
+| `API_URL` | Địa chỉ API mà portal gọi khi render phía server (mặc định `http://localhost:3000`) |
+| `NEXT_PUBLIC_API_URL` | Địa chỉ API mà trình duyệt gọi (mặc định `http://localhost:3000`; được gắn vào lúc build portal) |
 
 ## Lệnh
 
 Thư mục gốc: `npm run db:up`, `db:down`, `db:migrate`, `db:seed`, `build:shared`, `dev`, `address:fetch` (tải lại dữ liệu tỉnh/phường).
 
 API (`-w @hatlanh/api`): `dev`, `build`, `start`, `test`, `db:migrate`, `db:deploy`, `db:seed`, `db:generate`.
+
+Portal (`-w @hatlanh/portal`): `dev` (cổng 3001), `build`, `start`, `test` (Vitest), `typecheck`. Portal đọc file `.env` ở thư mục gốc.
 
 ## Test
 

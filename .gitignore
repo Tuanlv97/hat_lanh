@@ -4,3 +4,4 @@ node_modules/
 apps/api/uploads/
 dist/
 .next/
+*.tsbuildinfo
