@@ -97,9 +97,17 @@ export function CartView() {
     setNotice(`Đã giảm số lượng cho vừa hàng còn lại: ${names.join(', ')}.`);
   }, [resolved, cart]);
 
+  const removeLine = (l: ResolvedLine) => {
+    const name = l.item ? `${l.item.productName} ${l.item.label}` : 'sản phẩm không còn bán';
+    cart.remove(l.variantId);
+    setNotice(`Đã xóa ${name} khỏi giỏ hàng.`);
+    // The row (and its button) is gone: keep keyboard users in place at the top of the cart.
+    window.requestAnimationFrame(() => document.getElementById(HEADING_ID)?.focus());
+  };
+
   if (!cart.ready) {
     return (
-      <Shell>
+      <Shell notice={notice}>
         <p className="sr-only" role="status">
           Đang tải giỏ hàng…
         </p>
@@ -110,7 +118,7 @@ export function CartView() {
 
   if (cart.lines.length === 0) {
     return (
-      <Shell>
+      <Shell notice={notice}>
         <StateMessage
           title="Giỏ hàng đang trống"
           body="Gạo lứt, trà rang, mè và các loại hạt đang chờ bạn. Chọn vài món cho bữa cơm thanh đạm nhé."
@@ -123,16 +131,12 @@ export function CartView() {
   const count = cart.lines.reduce((s, l) => s + l.quantity, 0);
 
   return (
-    <Shell count={count}>
+    <Shell count={count} notice={notice}>
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-12">
         <section aria-labelledby="gio-hang-ds">
           <h2 id="gio-hang-ds" className="sr-only">
             Sản phẩm trong giỏ
           </h2>
-          <div aria-live="polite" role="status">
-            {notice && <p className="mb-4 rounded-2xl bg-honey-400 px-4 py-3 text-base font-medium">{notice}</p>}
-          </div>
-
           {state.status === 'error' ? (
             <div role="alert" className="rounded-[var(--radius-soft)] bg-green-100 p-6">
               <p className="text-lg font-medium">Chưa tải được giá và tồn kho.</p>
@@ -155,7 +159,7 @@ export function CartView() {
                   key={l.variantId}
                   line={l}
                   onQty={(n) => cart.setQuantity(l.variantId, n, l.item ? l.item.stock : undefined)}
-                  onRemove={() => cart.remove(l.variantId)}
+                  onRemove={() => removeLine(l)}
                 />
               ))}
             </ul>
@@ -202,11 +206,19 @@ export function CartView() {
   );
 }
 
-function Shell({ children, count }: { children: ReactNode; count?: number }) {
+const HEADING_ID = 'gio-hang-title';
+
+function Shell({ children, count, notice = '' }: { children: ReactNode; count?: number; notice?: string }) {
   return (
     <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6 sm:pt-14 lg:px-8">
-      <h1 className="text-[clamp(2.4rem,5.6vw,4.25rem)] leading-[1.02] font-semibold tracking-[-0.035em]">Giỏ hàng</h1>
+      <h1 id={HEADING_ID} tabIndex={-1} className="text-[clamp(2.4rem,5.6vw,4.25rem)] leading-[1.02] font-semibold tracking-[-0.035em] focus:outline-none focus-visible:outline-none">
+        Giỏ hàng
+      </h1>
       <p className="mt-3 text-lg">{count ? `${count} sản phẩm, giữ trong trình duyệt này.` : 'Giỏ hàng được giữ trong trình duyệt này.'}</p>
+      {/* Always mounted, so removals and stock clamps are announced even when the cart becomes empty. */}
+      <div aria-live="polite" role="status">
+        {notice && <p className="mt-6 rounded-2xl bg-honey-400 px-4 py-3 text-base font-medium">{notice}</p>}
+      </div>
       <div className="mt-8 sm:mt-10">{children}</div>
     </div>
   );

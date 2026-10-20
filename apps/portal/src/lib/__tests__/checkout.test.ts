@@ -81,16 +81,46 @@ describe('mapOrderError', () => {
     expect(b.refreshCart).toBe(true);
   });
 
-  it('rate limit, server errors and network failures get a friendly message and keep the cart', () => {
-    expect(mapOrderError(new ApiError(429, 'TOO_MANY_REQUESTS', 'ThrottlerException')).message).toMatch(/ít phút/);
-    const s = mapOrderError(new ApiError(500, 'INTERNAL', '{"statusCode":500}'));
-    expect(s.message).not.toContain('{');
-    expect(s.message).toMatch(/giỏ hàng vẫn được giữ/i);
+  it('429 and other 4xx say the order was NOT created (safe to retry)', () => {
+    const r = mapOrderError(new ApiError(429, 'TOO_MANY_REQUESTS', 'ThrottlerException'));
+    expect(r.kind).toBe('retry');
+    expect(r.message).toMatch(/chưa được tạo/);
+    expect(r.message).toMatch(/ít phút/);
+    expect(r.message).not.toMatch(/Chưa chắc/);
+    const f = mapOrderError(new ApiError(403, 'FORBIDDEN', 'Forbidden'));
+    expect(f.kind).toBe('retry');
+    expect(f.message).toMatch(/chưa được tạo/);
+    expect(f.message).not.toMatch(/Chưa chắc/);
+  });
+
+  it('5xx never claims the order was not received and warns before retrying', () => {
+    for (const status of [500, 502, 504]) {
+      const s = mapOrderError(new ApiError(status, 'INTERNAL', '{"statusCode":500}'));
+      expect(s.kind).toBe('uncertain');
+      expect(s.message).not.toContain('{');
+      expect(s.message).not.toMatch(/chưa nhận được đơn|chưa được tạo/);
+      expect(s.message).toMatch(/Chưa chắc đơn đã được gửi/);
+      expect(s.message).toMatch(/nhắn shop hoặc tra cứu đơn trước khi đặt lại/);
+      expect(s.message).toMatch(/giỏ hàng vẫn được giữ/i);
+    }
+  });
+
+  it('network failure and timeout are uncertain too, and keep the cart', () => {
     const n = mapOrderError(new TypeError('Failed to fetch'));
+    expect(n.kind).toBe('uncertain');
     expect(n.message).toMatch(/kết nối/);
+    expect(n.message).toMatch(/Chưa chắc đơn đã được gửi/);
     expect(n.message).toMatch(/giỏ hàng vẫn được giữ/i);
     const t = mapOrderError(new DOMException('timeout', 'AbortError'));
-    expect(t.message).toMatch(/kết nối|lâu/);
+    expect(t.kind).toBe('uncertain');
+    expect(t.message).toMatch(/Chưa chắc đơn đã được gửi/);
+  });
+
+  it('only cart problems are of kind "cart"', () => {
+    expect(mapOrderError(new ApiError(409, 'OUT_OF_STOCK', 'x')).kind).toBe('cart');
+    expect(mapOrderError(new ApiError(404, 'VARIANT_NOT_FOUND', 'x')).kind).toBe('cart');
+    expect(mapOrderError(new ApiError(400, 'VALIDATION_ERROR', 'x', { phone: 'Số điện thoại không hợp lệ' })).kind).toBe('fields');
+    expect(mapOrderError(new TypeError('x')).kind).not.toBe('cart');
   });
 
   it('never shows a raw JSON-looking server message', () => {

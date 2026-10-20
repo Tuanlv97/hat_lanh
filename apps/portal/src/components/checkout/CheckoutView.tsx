@@ -18,13 +18,14 @@ import {
   type CheckoutField,
   type CheckoutValues,
   type FieldErrors,
+  type OrderErrorKind,
 } from '@/lib/checkout';
 import { SHIPPING_NOTE } from '@/lib/site';
 import { useCartCatalog } from '@/lib/use-cart-catalog';
 import { CHECKOUT_LIMITS } from '@hatlanh/shared';
 import { OrderPlaced } from './OrderPlaced';
 
-const SUBMIT_TIMEOUT_MS = 20_000;
+const SUBMIT_TIMEOUT_MS = 30_000;
 const fid = (f: CheckoutField) => `f-${f}`;
 
 const fieldClass = (invalid: boolean) =>
@@ -90,10 +91,16 @@ export function CheckoutView() {
 
   const [values, setValues] = useState<CheckoutValues>(EMPTY_CHECKOUT);
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [formError, setFormError] = useState('');
+  // `kind` decides whether the alert links to the cart (only for stock / no-longer-sold problems).
+  const [formError, setFormError] = useState<{ message: string; kind: OrderErrorKind } | null>(null);
   const [pending, setPending] = useState(false);
   const inFlight = useRef(false);
-  const alertRef = useRef<HTMLDivElement>(null);
+  const submitRef = useRef<HTMLButtonElement>(null);
+  // Disabling the focused submit button drops focus; put it back once the button is enabled again.
+  const [refocusSubmit, setRefocusSubmit] = useState(0);
+  useEffect(() => {
+    if (refocusSubmit) submitRef.current?.focus();
+  }, [refocusSubmit]);
   const prefilled = useRef(false);
 
   // Logged-in customers start with their name, email and phone; every field stays editable.
@@ -128,13 +135,12 @@ export function CheckoutView() {
     setErrors((e) => ({ ...e, [field]: r.ok ? undefined : r.errors[field] }));
   };
 
-  const focusAlert = () => window.requestAnimationFrame(() => alertRef.current?.focus());
   const focusField = (f: CheckoutField) => window.requestAnimationFrame(() => document.getElementById(fid(f))?.focus());
 
   async function submit(e: FormEvent) {
     e.preventDefault();
     if (inFlight.current) return;
-    setFormError('');
+    setFormError(null);
 
     const v = validateCheckout(values);
     if (!v.ok) {
@@ -145,12 +151,15 @@ export function CheckoutView() {
     }
     setErrors({});
     if (!resolved || !resolved.canCheckout) {
+      // role="alert" announces it; focus stays on the submit button right below.
       setFormError(
         !resolved
-          ? 'Đang kiểm tra giá và tồn kho, bạn đợi một chút rồi bấm lại nhé.'
-          : 'Giỏ hàng có sản phẩm hết hàng hoặc không còn bán. Bạn vào giỏ hàng để xóa hoặc chỉnh số lượng trước khi đặt.',
+          ? { kind: 'retry', message: 'Đang kiểm tra giá và tồn kho, bạn đợi một chút rồi bấm lại nhé.' }
+          : {
+              kind: 'cart',
+              message: 'Giỏ hàng có sản phẩm hết hàng hoặc không còn bán. Bạn vào giỏ hàng để xóa hoặc chỉnh số lượng trước khi đặt.',
+            },
       );
-      focusAlert();
       return;
     }
 
@@ -170,11 +179,12 @@ export function CheckoutView() {
     } catch (err) {
       const m = mapOrderError(err);
       setErrors(m.fieldErrors);
-      setFormError(m.message);
+      setFormError({ message: m.message, kind: m.kind });
       if (m.refreshCart) void reload();
       const first = firstInvalidField(m.fieldErrors);
+      // Field errors move focus to the first one; other errors are announced by the alert region.
       if (first) focusField(first);
-      else focusAlert();
+      else setRefocusSubmit((n) => n + 1);
     } finally {
       window.clearTimeout(timer);
       inFlight.current = false;
@@ -336,11 +346,11 @@ export function CheckoutView() {
             <p className="mt-1 text-base">{PAYMENT_NOTE}</p>
           </div>
 
-          <div ref={alertRef} tabIndex={-1} role="alert" className="focus:outline-none">
+          <div role="alert">
             {formError && (
               <div className="mt-6 rounded-[var(--radius-soft)] bg-green-100 px-5 py-4 ring-2 ring-error ring-inset">
-                <p className="text-base font-medium text-error">{formError}</p>
-                {(blocked || /giỏ hàng/i.test(formError)) && (
+                <p className="text-base font-medium text-error">{formError.message}</p>
+                {formError.kind === 'cart' && (
                   <Link href="/gio-hang" className="mt-2 inline-flex min-h-11 items-center font-medium underline underline-offset-4">
                     Mở giỏ hàng
                   </Link>
@@ -350,6 +360,7 @@ export function CheckoutView() {
           </div>
 
           <button
+            ref={submitRef}
             type="submit"
             disabled={pending}
             aria-describedby={blocked ? 'dh-chan' : undefined}
