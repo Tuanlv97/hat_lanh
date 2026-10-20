@@ -11,6 +11,8 @@
   --ink-600: #5a6b60;
   --green-700: #4f7a52;
   --surface: #ffffff;
+  /* Form errors: 6.3:1 on bg, 5.7:1 on green-100; always paired with text, never colour alone. */
+  --error: #a3392b;
 }
 
 @theme inline {
@@ -22,6 +24,7 @@
   --color-green-700: var(--green-700);
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-error: var(--error);
   --font-sans: var(--font-be-vietnam), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
     Arial, sans-serif;
   --radius-soft: 1.25rem;

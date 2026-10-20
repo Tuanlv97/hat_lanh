@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useEffect, useId, useState } from 'react';
 import { Price } from '@/components/Price';
-import { addToCart } from '@/lib/cart-add';
+import { QuantityStepper } from '@/components/QuantityStepper';
+import { addToCart } from '@/lib/cart';
 import { clampQuantity, defaultVariant, maxQuantity, type Variant } from '@/lib/catalog';
 import { SHIPPING_NOTE } from '@/lib/site';
 
@@ -14,7 +15,6 @@ export function VariantPicker({ productName, variants }: { productName: string; 
   const [qty, setQty] = useState(1);
   const [note, setNote] = useState('');
   const groupId = useId();
-  const qtyId = useId();
 
   const selected = variants.find((v) => v.id === selectedId) ?? variants[0];
   const max = maxQuantity(selected);
@@ -34,12 +34,14 @@ export function VariantPicker({ productName, variants }: { productName: string; 
   const add = () => {
     if (soldOut) return;
     const n = clampQuantity(qty, max);
-    addToCart(selected.id, n);
-    setNote(`Đã thêm vào giỏ: ${n} × ${productName} (${selected.label})`);
+    // The line total never exceeds the stock shown here.
+    const { added } = addToCart(selected.id, n, max);
+    setNote(
+      added > 0
+        ? `Đã thêm vào giỏ: ${added} × ${productName} (${selected.label})${added < n ? ` — giỏ đã có đủ ${max} sản phẩm còn lại` : ''}`
+        : `Giỏ hàng đã có đủ ${max} sản phẩm ${selected.label} còn lại`,
+    );
   };
-
-  const stepBtn =
-    'inline-flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-xl text-ink-800 transition-colors duration-200 hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent';
 
   return (
     <div>
@@ -89,28 +91,7 @@ export function VariantPicker({ productName, variants }: { productName: string; 
       </p>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
-        <div className="inline-flex items-center rounded-full bg-green-100" role="group" aria-label="Số lượng">
-          <button type="button" className={stepBtn} onClick={() => setQty((q) => clampQuantity(q - 1, max))} disabled={soldOut || qty <= 1} aria-label="Giảm số lượng">
-            −
-          </button>
-          <label htmlFor={qtyId} className="sr-only">
-            Số lượng
-          </label>
-          <input
-            id={qtyId}
-            type="number"
-            inputMode="numeric"
-            min={1}
-            max={Math.max(1, max)}
-            value={qty}
-            disabled={soldOut}
-            onChange={(e) => setQty(e.target.value === '' ? 1 : clampQuantity(Number(e.target.value), max))}
-            className="h-12 w-12 bg-transparent text-center text-lg font-medium tabular-nums [appearance:textfield] focus:outline-none disabled:opacity-40 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-          />
-          <button type="button" className={stepBtn} onClick={() => setQty((q) => clampQuantity(q + 1, max))} disabled={soldOut || qty >= max} aria-label="Tăng số lượng">
-            +
-          </button>
-        </div>
+        <QuantityStepper value={qty} max={max} onChange={setQty} label={`Số lượng ${productName} ${selected.label}`} disabled={soldOut} />
 
         <button
           type="button"

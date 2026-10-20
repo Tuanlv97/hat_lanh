@@ -1,0 +1,100 @@
+import { describe, expect, it } from 'vitest';
+import { ApiError } from '../api';
+import { EMPTY_CHECKOUT, firstInvalidField, mapOrderError, validateCheckout, type CheckoutValues } from '../checkout';
+
+const good: CheckoutValues = {
+  fullName: '  Nguyễn Thị Lành ',
+  phone: '0912 345 678',
+  email: 'lanh@example.com',
+  provinceCode: '01',
+  wardCode: '00004',
+  addressDetail: '12 ngõ Trúc Lạc',
+};
+
+describe('validateCheckout', () => {
+  it('accepts a good form, trims, and normalizes the phone', () => {
+    const r = validateCheckout(good);
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.data).toEqual({ ...good, fullName: 'Nguyễn Thị Lành', phone: '0912345678' });
+  });
+
+  it('accepts +84 numbers', () => {
+    const r = validateCheckout({ ...good, phone: '+84 912 345 678' });
+    expect(r.ok && r.data.phone).toBe('0912345678');
+  });
+
+  it('returns the schema Vietnamese message per field', () => {
+    const r = validateCheckout({ ...good, phone: '12345', email: 'abc', wardCode: '' });
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errors).toEqual({
+        phone: 'Số điện thoại không hợp lệ',
+        email: 'Email không hợp lệ',
+        wardCode: 'Vui lòng chọn Phường/Xã',
+      });
+    }
+  });
+
+  it('an empty form reports every field', () => {
+    const r = validateCheckout(EMPTY_CHECKOUT);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(Object.keys(r.errors).sort()).toEqual(['addressDetail', 'email', 'fullName', 'phone', 'provinceCode', 'wardCode']);
+  });
+});
+
+describe('firstInvalidField', () => {
+  it('follows the on-screen order of the form', () => {
+    expect(firstInvalidField({ wardCode: 'x', phone: 'y' })).toBe('phone');
+    expect(firstInvalidField({ addressDetail: 'x' })).toBe('addressDetail');
+    expect(firstInvalidField({})).toBeNull();
+  });
+});
+
+describe('mapOrderError', () => {
+  it('maps 400 VALIDATION_ERROR fields onto the inputs', () => {
+    const r = mapOrderError(new ApiError(400, 'VALIDATION_ERROR', 'Bad Request', { wardCode: 'Phường/Xã không hợp lệ', foo: 'x' }));
+    expect(r.fieldErrors).toEqual({ wardCode: 'Phường/Xã không hợp lệ' });
+    expect(r.message).toMatch(/kiểm tra lại/);
+    expect(r.refreshCart).toBe(false);
+  });
+
+  it('a VALIDATION_ERROR on items points at the cart', () => {
+    const r = mapOrderError(new ApiError(400, 'VALIDATION_ERROR', 'Bad Request', { items: 'Giỏ hàng trống' }));
+    expect(r.fieldErrors).toEqual({});
+    expect(r.message).toContain('Giỏ hàng trống');
+    expect(r.refreshCart).toBe(true);
+  });
+
+  it('OUT_OF_STOCK names the product and asks to fix the cart', () => {
+    const r = mapOrderError(new ApiError(409, 'OUT_OF_STOCK', '"Gạo lứt đỏ - 1kg" không đủ hàng'));
+    expect(r.message).toContain('"Gạo lứt đỏ - 1kg" không đủ hàng');
+    expect(r.message).toMatch(/giỏ hàng/i);
+    expect(r.refreshCart).toBe(true);
+  });
+
+  it('VARIANT_UNAVAILABLE and VARIANT_NOT_FOUND ask to remove the item', () => {
+    const a = mapOrderError(new ApiError(409, 'VARIANT_UNAVAILABLE', '"Mè rang - 200g" hiện không còn bán'));
+    expect(a.message).toContain('Mè rang');
+    expect(a.refreshCart).toBe(true);
+    const b = mapOrderError(new ApiError(404, 'VARIANT_NOT_FOUND', 'Sản phẩm không tồn tại'));
+    expect(b.message).toMatch(/không còn bán/);
+    expect(b.refreshCart).toBe(true);
+  });
+
+  it('rate limit, server errors and network failures get a friendly message and keep the cart', () => {
+    expect(mapOrderError(new ApiError(429, 'TOO_MANY_REQUESTS', 'ThrottlerException')).message).toMatch(/ít phút/);
+    const s = mapOrderError(new ApiError(500, 'INTERNAL', '{"statusCode":500}'));
+    expect(s.message).not.toContain('{');
+    expect(s.message).toMatch(/giỏ hàng vẫn được giữ/i);
+    const n = mapOrderError(new TypeError('Failed to fetch'));
+    expect(n.message).toMatch(/kết nối/);
+    expect(n.message).toMatch(/giỏ hàng vẫn được giữ/i);
+    const t = mapOrderError(new DOMException('timeout', 'AbortError'));
+    expect(t.message).toMatch(/kết nối|lâu/);
+  });
+
+  it('never shows a raw JSON-looking server message', () => {
+    const r = mapOrderError(new ApiError(409, 'OUT_OF_STOCK', '{"error":"OUT_OF_STOCK"}'));
+    expect(r.message).not.toContain('{');
+  });
+});

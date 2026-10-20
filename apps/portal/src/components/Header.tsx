@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useId, useState } from 'react';
 import { useAuth } from '@/lib/auth';
-import { useCartCount } from '@/lib/cart-count';
+import { useCartCount } from '@/lib/cart';
 import { NAV_LINKS } from '@/lib/site';
 import { Logo } from './Logo';
 
