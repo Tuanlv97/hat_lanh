@@ -15,7 +15,10 @@
     "build:shared": "npm run build -w @hatlanh/shared",
     "db:migrate": "npm run db:migrate -w @hatlanh/api",
     "db:seed": "npm run db:seed -w @hatlanh/api",
-    "address:fetch": "tsx scripts/fetch-address.ts"
+    "address:fetch": "tsx scripts/fetch-address.ts",
+    "smoke": "tsx scripts/smoke.ts",
+    "verify:reports": "node scripts/verify-reports.mjs",
+    "test": "npm run build:shared && npm test --workspaces"
   },
   "devDependencies": {
     "concurrently": "^9.2.5"
