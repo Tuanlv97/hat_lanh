@@ -13,6 +13,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { OrdersModule } from './orders/orders.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ReturnsModule } from './returns/returns.module';
+import { ReportsModule } from './reports/reports.module';
 import { HealthController } from './health/health.controller';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
@@ -33,6 +34,7 @@ import { UsersModule } from './users/users.module';
     ReviewsModule,
     CommentsModule,
     PostsModule,
+    ReportsModule,
   ],
   controllers: [HealthController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
