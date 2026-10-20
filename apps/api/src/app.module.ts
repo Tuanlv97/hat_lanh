@@ -3,6 +3,9 @@ import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AddressModule } from './address/address.module';
 import { AuthModule } from './auth/auth.module';
+import { CommentsModule } from './comments/comments.module';
+import { ModerationModule } from './moderation/moderation.module';
+import { ReviewsModule } from './reviews/reviews.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { NotificationsModule } from './notifications/notifications.module';
@@ -25,6 +28,9 @@ import { UsersModule } from './users/users.module';
     OrdersModule,
     ReturnsModule,
     PaymentsModule,
+    ModerationModule,
+    ReviewsModule,
+    CommentsModule,
   ],
   controllers: [HealthController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
