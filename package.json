@@ -12,6 +12,9 @@
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",
     "dev": "npm run dev --workspaces --if-present",
-    "build:shared": "npm run build -w @hatlanh/shared"
+    "build:shared": "npm run build -w @hatlanh/shared",
+    "db:migrate": "npm run db:migrate -w @hatlanh/api",
+    "db:seed": "npm run db:seed -w @hatlanh/api",
+    "address:fetch": "tsx scripts/fetch-address.ts"
   }
 }

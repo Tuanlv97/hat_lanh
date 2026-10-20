@@ -1,0 +1,250 @@
+// Hạt Lành database schema.
+// Enum values mirror the constants in @hatlanh/shared (status.ts). Keep them in sync.
+// Money is always integer VND (Int).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPING
+  COMPLETED
+  CANCELLED
+}
+
+enum ReturnStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+}
+
+enum ReturnSource {
+  CUSTOMER
+  ADMIN
+}
+
+enum ReturnReason {
+  DAMAGED
+  WRONG_ITEM
+  CHANGED_MIND
+  OTHER
+}
+
+enum ModerationStatus {
+  VISIBLE
+  PENDING
+  HIDDEN
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String?   @unique
+  phone         String?   @unique
+  passwordHash  String?
+  name          String
+  role          Role      @default(USER)
+  provider      String?
+  providerId    String?
+  emailVerified Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  orders        Order[]
+  reviews       Review[]
+  comments      Comment[]
+
+  @@unique([provider, providerId])
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  name      String
+  sortOrder Int       @default(0)
+  products  Product[]
+}
+
+model Product {
+  id           String        @id @default(cuid())
+  slug         String        @unique
+  name         String
+  categoryId   String
+  category     Category      @relation(fields: [categoryId], references: [id])
+  description  String
+  origin       String
+  benefits     String
+  images       String[]
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  variants     Variant[]
+  orderItems   OrderItem[]
+  reviews      Review[]
+  postProducts PostProduct[]
+
+  @@index([categoryId])
+}
+
+model Variant {
+  id         String      @id @default(cuid())
+  productId  String
+  product    Product     @relation(fields: [productId], references: [id])
+  label      String
+  priceVnd   Int
+  stock      Int         @default(0)
+  isActive   Boolean     @default(true)
+  orderItems OrderItem[]
+
+  @@unique([productId, label])
+}
+
+model Order {
+  id             String          @id @default(cuid())
+  code           String          @unique
+  userId         String?
+  user           User?           @relation(fields: [userId], references: [id])
+  status         OrderStatus     @default(PENDING)
+  fullName       String
+  phone          String
+  email          String
+  provinceCode   String
+  wardCode       String
+  addressDetail  String
+  totalVnd       Int
+  createdAt      DateTime        @default(now())
+  completedAt    DateTime?
+  items          OrderItem[]
+  returnRequests ReturnRequest[]
+
+  @@index([userId])
+  @@index([phone])
+  @@index([status])
+}
+
+model OrderItem {
+  id           String       @id @default(cuid())
+  orderId      String
+  order        Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product      @relation(fields: [productId], references: [id])
+  variantId    String
+  variant      Variant      @relation(fields: [variantId], references: [id])
+  productName  String
+  variantLabel String
+  unitPriceVnd Int
+  quantity     Int
+  returnItems  ReturnItem[]
+
+  @@index([orderId])
+}
+
+model ReturnRequest {
+  id        String       @id @default(cuid())
+  orderId   String
+  order     Order        @relation(fields: [orderId], references: [id])
+  status    ReturnStatus @default(REQUESTED)
+  source    ReturnSource
+  note      String       @default("")
+  createdAt DateTime     @default(now())
+  items     ReturnItem[]
+
+  @@index([orderId])
+}
+
+model ReturnItem {
+  id          String        @id @default(cuid())
+  returnId    String
+  request     ReturnRequest @relation(fields: [returnId], references: [id], onDelete: Cascade)
+  orderItemId String
+  orderItem   OrderItem     @relation(fields: [orderItemId], references: [id])
+  quantity    Int
+  reason      ReturnReason
+  restock     Boolean       @default(false)
+
+  @@index([returnId])
+}
+
+model Review {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id])
+  productId String
+  product   Product          @relation(fields: [productId], references: [id])
+  rating    Int // 1..5, enforced in the service layer
+  content   String
+  status    ModerationStatus @default(VISIBLE)
+  createdAt DateTime         @default(now())
+
+  @@unique([userId, productId])
+  @@index([productId])
+}
+
+model Comment {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id])
+  postId    String
+  post      Post             @relation(fields: [postId], references: [id], onDelete: Cascade)
+  content   String
+  status    ModerationStatus @default(VISIBLE)
+  createdAt DateTime         @default(now())
+
+  @@index([postId])
+}
+
+model SensitiveWord {
+  id        String   @id @default(cuid())
+  term      String   @unique // stored normalized with normalizeVi from @hatlanh/shared
+  createdAt DateTime @default(now())
+}
+
+model Topic {
+  id    String @id @default(cuid())
+  slug  String @unique
+  name  String
+  posts Post[]
+}
+
+model Post {
+  id           String        @id @default(cuid())
+  slug         String        @unique
+  title        String
+  excerpt      String        @default("")
+  html         String // sanitized HTML
+  coverImage   String?
+  topicId      String?
+  topic        Topic?        @relation(fields: [topicId], references: [id])
+  status       PostStatus    @default(DRAFT)
+  publishAt    DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  comments     Comment[]
+  postProducts PostProduct[]
+
+  @@index([status, publishAt])
+}
+
+model PostProduct {
+  postId    String
+  post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@id([postId, productId])
+}
