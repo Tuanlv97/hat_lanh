@@ -5,6 +5,7 @@ import { CommentSection } from '@/components/blog/CommentSection';
 import { ProductCard } from '@/components/ProductCard';
 import { StateMessage } from '@/components/StateMessage';
 import { assetUrl } from '@/lib/api';
+import { withUploadOrigin } from '@/lib/blog';
 import { blogHref } from '@/lib/blog';
 import { getPost } from '@/lib/blog-server';
 import { formatDateVi } from '@/lib/catalog';
@@ -82,7 +83,7 @@ export default async function PostPage({ params }: { params: Params }) {
       )}
 
       {/* Safe only because the API sanitizes the html when the post is saved. */}
-      <div className="post-body mt-8 max-w-[60ch]" dangerouslySetInnerHTML={{ __html: p.html }} />
+      <div className="post-body mt-8 max-w-[60ch]" dangerouslySetInnerHTML={{ __html: withUploadOrigin(p.html, assetUrl('/uploads/')) }} />
 
       {p.products.length > 0 && (
         <section aria-labelledby="sp-lien-quan" className="mt-20">

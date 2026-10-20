@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { blogHref, COMMENT_MAX, parsePage, totalPages, validateComment } from '../blog';
+import { blogHref, COMMENT_MAX, parsePage, totalPages, validateComment, withUploadOrigin } from '../blog';
 
 describe('blogHref', () => {
   it('omits defaults', () => {
@@ -36,4 +36,11 @@ describe('validateComment', () => {
     expect(validateComment('a'.repeat(COMMENT_MAX + 1))).toMatch(/tối đa/);
   });
   it('accepts normal text', () => expect(validateComment(' Bài hay quá ')).toBeNull());
+});
+
+describe('withUploadOrigin', () => {
+  it('points upload images at the API host and leaves others', () => {
+    const out = withUploadOrigin('<img src="/uploads/a.png"><img src="https://x/y.png">', 'http://api/uploads/');
+    expect(out).toBe('<img src="http://api/uploads/a.png"><img src="https://x/y.png">');
+  });
 });

@@ -53,3 +53,8 @@ export function validateComment(raw: string): string | null {
   if (t.length > COMMENT_MAX) return `Nội dung tối đa ${COMMENT_MAX} ký tự`;
   return null;
 }
+
+/** Post html keeps image paths as `/uploads/...`, which live on the API host: point them there. `base` is `assetUrl('/uploads/')`. */
+export function withUploadOrigin(html: string, base: string): string {
+  return html.replace(/(\ssrc=["'])\/uploads\//gi, `$1${base}`);
+}

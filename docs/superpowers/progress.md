@@ -4,7 +4,7 @@ Plan: [plans/2026-10-19-hat-lanh.md](plans/2026-10-19-hat-lanh.md) (22 task). Nh
 
 ## Điểm dừng
 
-Đã xong Task 19. Task 20 trở đi (blog/kiểm duyệt/người dùng, báo cáo, smoke) chưa làm.
+Đã xong Task 20 và 21. Chỉ còn Task 22 (smoke test và bàn giao).
 
 | Task | Nội dung | Trạng thái | Commit |
 |---|---|---|---|
@@ -26,13 +26,16 @@ Plan: [plans/2026-10-19-hat-lanh.md](plans/2026-10-19-hat-lanh.md) (22 task). Nh
 | 16 | Account, orders, returns, reviews | xong | 2d2f887 |
 | 17 | Blog và about | xong | a279061 |
 | 18 | Admin foundation và login | xong | 387bbff |
-| 19 | Admin: products, orders, returns | xong | (commit Task 19) |
-| 20–22 | Admin blog/moderation/users, reports, smoke | chưa làm | |
+| 19 | Admin: products, orders, returns | xong | 27d943b |
+| 20–21 | Admin: blog, moderation, users, reports | xong | (commit Task 20-21) |
+| 22 | Smoke test và bàn giao | chưa làm | |
 
 ## Làm tiếp
-Bắt đầu từ **Task 20: Blog, moderation, users screens**.
+Bắt đầu từ **Task 22: End-to-end smoke and handover**.
 
 ## Ghi chú
 - Trang `ve-chung-toi` còn các chỗ giữ chỗ `[Điền …]` để chủ shop tự điền.
 - Chưa kiểm tra bằng trình duyệt luồng bình luận khi đã đăng nhập (API có test e2e).
 - Admin (Task 19) chưa được click thử trên trình duyệt; đã kiểm tra bằng tsc, build và gọi các API mà màn hình dùng.
+- Báo cáo kiểm thử bằng `scripts/verify-reports.mjs` (chạy với API đang chạy): so khớp số liệu báo cáo với tính lại độc lập từ đơn/hoàn trả thô, cộng delta chính xác từ dữ liệu mẫu; 23 kiểm tra đều đạt. Script tạo thêm 3 đơn và 1 hoàn trả vào DB dev.
+- Task 20-21 chưa click thử trên trình duyệt (editor contentEditable, biểu đồ SVG).
