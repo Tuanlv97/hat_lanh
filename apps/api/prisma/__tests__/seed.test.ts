@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 import { seed } from '../seed';
+import { resetDb } from '../../test/helpers';
 
 const SLUGS = [
   'gao-lut-do',
@@ -21,6 +22,7 @@ describe('seed', () => {
   const prisma = new PrismaClient();
 
   beforeAll(async () => {
+    await resetDb(prisma);
     await seed(prisma);
     await seed(prisma); // must be idempotent
   });

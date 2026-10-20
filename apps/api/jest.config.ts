@@ -5,7 +5,7 @@ const config: Config = {
   rootDir: '.',
   testEnvironment: 'node',
   moduleFileExtensions: ['ts', 'js', 'json'],
-  testRegex: '.*\\.(test|spec)\\.ts$',
+  testRegex: '.*[.-](test|spec)\\.ts$',
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   transform: { '^.+\\.ts$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.json' }] },
   globalSetup: '<rootDir>/test/global-setup.ts',

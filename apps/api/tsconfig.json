@@ -2,7 +2,17 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "types": ["node", "jest"]
+    "types": [
+      "node",
+      "jest"
+    ],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
-  "include": ["src", "prisma", "test", "jest.config.ts"]
+  "include": [
+    "src",
+    "prisma",
+    "test",
+    "jest.config.ts"
+  ]
 }
