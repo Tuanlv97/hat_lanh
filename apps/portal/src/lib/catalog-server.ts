@@ -1,7 +1,7 @@
 // Server components only: reads API_URL through api().
 import { cache } from 'react';
 import { api, ApiError } from './api';
-import type { Category, ProductDetail, ProductSummary } from './catalog';
+import { isSafeSlug, type Category, type ProductDetail, type ProductSummary } from './catalog';
 
 /** A fetch that never throws: pages render a friendly message on `error` instead of crashing. */
 export type Loaded<T> = { ok: true; data: T } | { ok: false; notFound: boolean };
@@ -29,4 +29,8 @@ export function getProducts(params: { category?: string; q?: string } = {}) {
 }
 
 /** Deduplicated per request so generateMetadata and the page share one API call. */
-export const getProduct = cache((slug: string) => load<ProductDetail>(`/products/${encodeURIComponent(slug)}`));
+export const getProduct = cache(
+  (slug: string): Promise<Loaded<ProductDetail>> =>
+    // `.`/`..` would walk the API path (`/products/..` is `/`): treat them as unknown products.
+    isSafeSlug(slug) ? load<ProductDetail>(`/products/${encodeURIComponent(slug)}`) : Promise.resolve({ ok: false, notFound: true }),
+);

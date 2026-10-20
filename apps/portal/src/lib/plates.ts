@@ -1,6 +1,7 @@
 /**
- * Public-domain botanical plates (Wikimedia Commons) of the plants behind the shop's goods.
- * They illustrate the plant, never a specific product or where it was grown.
+ * Public-domain botanical plates (Wikimedia Commons), used as decoration only.
+ * Captions name the plant and the credit; they say nothing about the shop's products.
+ * (The Prunus mume plate is a JPEG re-encode of the Commons PNG, same image.)
  */
 export type Plate = {
   key: string;
@@ -68,7 +69,7 @@ export const PLATES: Plate[] = [
   },
   {
     key: 'mo',
-    src: '/thuc-vat/mo-prunus-mume.png',
+    src: '/thuc-vat/mo-prunus-mume.jpg',
     width: 1701,
     height: 2292,
     alt: 'Tranh thực vật cành mơ (Prunus mume) với hoa trắng, hoa hồng và quả vàng',
@@ -80,16 +81,3 @@ export const PLATES: Plate[] = [
     },
   },
 ];
-
-/** Which plate stands for each seeded category (unknown categories fall back to rice). */
-const BY_CATEGORY: Record<string, string> = {
-  'gao-lut': 'lua',
-  tra: 'tra',
-  'gia-vi-cham': 'me',
-  'hat-ngu-coc': 'oc-cho',
-};
-
-export function plateForCategory(slug: string): Plate {
-  const key = BY_CATEGORY[slug] ?? 'lua';
-  return PLATES.find((p) => p.key === key) ?? PLATES[0];
-}

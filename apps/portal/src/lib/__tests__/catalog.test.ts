@@ -5,6 +5,7 @@ import {
   formatDateVi,
   hasPriceRange,
   isOriginPlaceholder,
+  isSafeSlug,
   isSoldOut,
   maxQuantity,
   priceFrom,
@@ -92,5 +93,22 @@ describe('formatDateVi', () => {
   });
   it('returns an empty string for an invalid date', () => {
     expect(formatDateVi('nope')).toBe('');
+  });
+});
+
+describe('isSafeSlug', () => {
+  it('accepts ordinary slugs', () => {
+    expect(isSafeSlug('gao-lut-do')).toBe(true);
+    expect(isSafeSlug('g%C3%A1o')).toBe(true);
+  });
+  it('rejects empty, dot segments (raw or encoded) and slashes', () => {
+    expect(isSafeSlug('')).toBe(false);
+    expect(isSafeSlug('.')).toBe(false);
+    expect(isSafeSlug('..')).toBe(false);
+    expect(isSafeSlug('%2E%2E')).toBe(false);
+    expect(isSafeSlug('%2e')).toBe(false);
+    expect(isSafeSlug('a/b')).toBe(false);
+    expect(isSafeSlug('a%2Fb')).toBe(false);
+    expect(isSafeSlug('%E0%A4%A')).toBe(false);
   });
 });

@@ -70,7 +70,7 @@ body {
   transition: opacity 1600ms ease-in-out;
 }
 
-/* Slow drift on the visible plate: the page's one moving picture. */
+/* Slow drift on the visible plate. */
 @keyframes plate-drift {
   from {
     transform: scale(1);
@@ -79,8 +79,9 @@ body {
     transform: scale(1.06);
   }
 }
+/* Finite: out and back once (28s), and paused by the stage's pause control. */
 .plate-drift {
-  animation: plate-drift 14s ease-in-out infinite alternate;
+  animation: plate-drift 14s ease-in-out 2 alternate;
 }
 
 /* Non-blocking "added to cart" note. */

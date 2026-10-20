@@ -2,10 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCallback, useEffect, useState, type MouseEvent, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { ProductCard } from '@/components/ProductCard';
 import { hasPriceRange, isSoldOut, priceFrom, type ProductSummary } from '@/lib/catalog';
-import { PLATES, plateForCategory } from '@/lib/plates';
+import { PLATES } from '@/lib/plates';
 
 export type StageCategory = { slug: string; name: string; products: ProductSummary[] };
 
@@ -18,55 +18,101 @@ type HomeStageProps = {
 const HOLD_MS = 6000;
 
 /**
- * The split stage: a botanical plate stays put on one half while the other half scrolls.
- * Picking a group of grains swaps both the products shown and the plant on the plate.
+ * The split stage: a botanical plate (decoration) stays put on one half while the other half scrolls.
+ * The plates crossfade once through the set and stop; the visitor can pause or replay them, and
+ * choosing a group stops them, and hovering or focusing the plate pauses them (WCAG 2.2.2).
  */
+const pill = (on: boolean) =>
+  `inline-flex min-h-11 cursor-pointer items-center rounded-full px-5 text-lg transition-colors duration-200 active:scale-[0.98] ${
+    on ? 'bg-ink-800 font-medium text-bg' : 'bg-green-100 text-ink-800 hover:bg-green-500'
+  }`;
+
 export function HomeStage({ hero, categories }: HomeStageProps) {
   const [active, setActive] = useState(categories[0]?.slug ?? '');
-  const [plateKey, setPlateKey] = useState(PLATES[0].key);
-  const [chosen, setChosen] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const [held, setHeld] = useState(false); // hover or keyboard focus inside the stage
+  const [steps, setSteps] = useState(0);
+  const [hydrated, setHydrated] = useState(false);
+  const [motionOk, setMotionOk] = useState(false);
 
-  // Slow crossfade through the plates until the visitor picks a group; paused when the tab is hidden.
   useEffect(() => {
-    if (chosen || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const id = window.setInterval(() => {
-      if (document.hidden) return;
-      setPlateKey((k) => PLATES[(PLATES.findIndex((p) => p.key === k) + 1) % PLATES.length].key);
-    }, HOLD_MS);
-    return () => window.clearInterval(id);
-  }, [chosen]);
-
-  const choose = useCallback((slug: string, e: MouseEvent) => {
-    e.preventDefault();
-    setActive(slug);
-    setPlateKey(plateForCategory(slug).key);
-    setChosen(true);
+    setHydrated(true);
+    const ok = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setMotionOk(ok);
+    setPlaying(ok);
   }, []);
 
+  // One full cycle, then stop. Paused while held, while the tab is hidden, or when the visitor paused it.
+  useEffect(() => {
+    if (!playing || held) return;
+    const id = window.setInterval(() => {
+      if (document.hidden) return;
+      setIndex((i) => (i + 1) % PLATES.length);
+      setSteps((n) => n + 1);
+    }, HOLD_MS);
+    return () => window.clearInterval(id);
+  }, [playing, held]);
+
+  useEffect(() => {
+    if (steps >= PLATES.length) {
+      setPlaying(false);
+      setSteps(0);
+    }
+  }, [steps]);
+
+  const stop = () => setPlaying(false);
   const current = categories.find((c) => c.slug === active) ?? categories[0];
-  const plate = PLATES.find((p) => p.key === plateKey) ?? PLATES[0];
+  const plate = PLATES[index] ?? PLATES[0];
+  const running = playing && !held;
 
   return (
     // Phone: hero, plate, groups. Desktop: hero and groups scroll on the left while the plate holds the right half.
-    <div className="mx-auto grid max-w-6xl gap-x-10 gap-y-10 px-4 sm:px-6 md:grid-cols-2 md:grid-rows-[auto_1fr] lg:gap-x-14 lg:px-8">
+    <div
+      className="mx-auto grid max-w-6xl gap-x-10 gap-y-10 px-4 sm:px-6 md:grid-cols-2 md:grid-rows-[auto_1fr] lg:gap-x-14 lg:px-8"
+      onPointerDown={(e) => {
+        if (!(e.target as Element).closest('[data-plate-toggle]')) stop();
+      }}
+      onKeyDown={(e) => {
+        if (!(e.target as Element).closest('[data-plate-toggle]')) stop();
+      }}
+    >
       <div className="md:col-start-1 md:row-start-1">{hero}</div>
 
       {/* The fixed half: a plate on white paper, a caption bar along its foot. */}
       <div className="md:col-start-2 md:row-span-2 md:row-start-1">
-        <figure className="relative h-[44svh] min-h-72 overflow-hidden rounded-[var(--radius-softer)] bg-surface md:sticky md:top-[5.25rem] md:h-[calc(100svh-6.5rem)] md:min-h-[32rem]">
+        <figure
+          onMouseEnter={() => setHeld(true)}
+          onMouseLeave={() => setHeld(false)}
+          onFocus={() => setHeld(true)}
+          onBlur={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setHeld(false);
+          }}
+          className="relative h-[44svh] min-h-72 overflow-hidden rounded-[var(--radius-softer)] bg-surface md:sticky md:top-[5.25rem] md:h-[calc(100svh-6.5rem)] md:min-h-[32rem]">
           {PLATES.map((p, i) => (
             <div key={p.key} className={`plate absolute inset-0 bottom-14 ${p.key === plate.key ? 'opacity-100' : 'opacity-0'}`} aria-hidden={p.key !== plate.key}>
-              <div className={`absolute inset-4 sm:inset-8 ${p.key === plate.key ? 'plate-drift' : ''}`}>
+              <div
+                className={`absolute inset-4 sm:inset-8 ${p.key === plate.key && motionOk ? 'plate-drift' : ''}`}
+                style={{ animationPlayState: running ? 'running' : 'paused' }}
+              >
                 <Image src={p.src} alt={p.key === plate.key ? p.alt : ''} fill priority={i === 0} sizes="(min-width: 768px) 46vw, 92vw" className="object-contain" />
               </div>
             </div>
           ))}
-          <figcaption className="absolute inset-x-0 bottom-0 flex h-14 items-center justify-between gap-3 bg-green-100 px-5 text-base">
-            <span aria-live="polite" className="truncate font-medium">{plate.caption}</span>
-            {current && chosen && (
-              <span className="shrink-0 text-ink-600">
-                {current.name} · {current.products.length} sản phẩm
-              </span>
+          <figcaption className="absolute inset-x-0 bottom-0 flex h-14 items-center justify-between gap-3 bg-green-100 pr-2 pl-5 text-base">
+            <span className="truncate font-medium">{plate.caption}</span>
+            {motionOk && (
+              <button
+                type="button"
+                data-plate-toggle
+                onClick={() => setPlaying((v) => !v)}
+                className="inline-flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full px-3 sm:px-4 text-base font-medium transition-colors duration-200 hover:bg-green-500"
+              >
+                <svg viewBox="0 0 16 16" className="h-4 w-4" aria-hidden="true" fill="currentColor">
+                  {playing ? <path d="M4 3h3v10H4zM9 3h3v10H9z" /> : <path d="M5 3l8 5-8 5z" />}
+                </svg>
+                <span className="sr-only sm:not-sr-only">{playing ? 'Dừng đổi tranh' : 'Xem các tranh'}</span>
+              </button>
             )}
           </figcaption>
         </figure>
@@ -77,26 +123,33 @@ export function HomeStage({ hero, categories }: HomeStageProps) {
         {categories.length > 0 && (
           <section aria-labelledby="nhom-hat" className="mt-14 md:mt-24">
             <h2 id="nhom-hat" className="text-[clamp(1.75rem,3vw,2.5rem)] leading-tight font-semibold tracking-[-0.02em]">
-              Chọn theo nhóm hạt
+              Sản phẩm theo nhóm
             </h2>
-            <p className="mt-3 max-w-[46ch] text-lg">Mỗi nhóm một cây: lúa cho gạo lứt, chè cho trà, mè cho gia vị chấm, hạt cho bữa sáng.</p>
+            <p className="mt-3 max-w-[46ch] text-lg">Chọn một nhóm để xem các sản phẩm trong nhóm.</p>
 
             <ul className="mt-8 flex flex-wrap gap-2" aria-label="Nhóm sản phẩm">
               {categories.map((c) => {
                 const on = c.slug === current?.slug;
                 return (
                   <li key={c.slug}>
-                    <Link
-                      href={`/san-pham?category=${encodeURIComponent(c.slug)}`}
-                      onClick={(e) => choose(c.slug, e)}
-                      aria-pressed={on}
-                      role="button"
-                      className={`inline-flex min-h-11 cursor-pointer items-center rounded-full px-5 text-lg transition-colors duration-200 active:scale-[0.98] ${
-                        on ? 'bg-ink-800 font-medium text-bg' : 'bg-green-100 text-ink-800 hover:bg-green-500'
-                      }`}
-                    >
-                      {c.name}
-                    </Link>
+                    {hydrated ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActive(c.slug);
+                          stop();
+                        }}
+                        aria-pressed={on}
+                        className={pill(on)}
+                      >
+                        {c.name}
+                      </button>
+                    ) : (
+                      // Before hydration (or without JS) each group is a plain link to the filtered list.
+                      <Link href={`/san-pham?category=${encodeURIComponent(c.slug)}`} className={pill(on)}>
+                        {c.name}
+                      </Link>
+                    )}
                   </li>
                 );
               })}

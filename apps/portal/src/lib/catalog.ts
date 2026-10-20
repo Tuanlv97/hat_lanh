@@ -96,3 +96,15 @@ export function formatDateVi(iso: string): string {
   if (Number.isNaN(d.getTime())) return '';
   return dateFmt.format(d);
 }
+
+/** A product slug safe to put in an API path: not empty, not `.`/`..` (raw or percent-encoded), no slashes. */
+export function isSafeSlug(slug: string): boolean {
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(slug);
+  } catch {
+    return false;
+  }
+  if (!decoded || decoded === '.' || decoded === '..') return false;
+  return !decoded.includes('/') && !decoded.includes('\\');
+}

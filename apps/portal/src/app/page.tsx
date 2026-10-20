@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { GrainField } from '@/components/home/GrainField';
 import { HomeStage, type StageCategory } from '@/components/home/HomeStage';
 import { PriceSheet } from '@/components/home/PriceSheet';
 import { Reveal } from '@/components/Reveal';
@@ -20,6 +19,7 @@ export default async function HomePage() {
         .filter((c) => c.products.length > 0)
     : [];
   const loadFailed = !cats.ok || !prods.ok;
+  const hasPriceSheet = categories.length > 0;
   const mume = PLATES.find((p) => p.key === 'mo') ?? PLATES[0];
 
   const hero = (
@@ -35,12 +35,14 @@ export default async function HomePage() {
         >
           Xem sản phẩm
         </Link>
-        <Link
-          href="#bang-gia"
-          className="inline-flex h-13 items-center rounded-full bg-honey-400 px-5 text-lg sm:px-7 font-medium transition-[filter,transform] duration-200 hover:brightness-105 active:scale-[0.98]"
-        >
-          Xem bảng giá
-        </Link>
+        {hasPriceSheet && (
+          <Link
+            href="#bang-gia"
+            className="inline-flex h-13 items-center rounded-full bg-honey-400 px-5 text-lg sm:px-7 font-medium transition-[filter,transform] duration-200 hover:brightness-105 active:scale-[0.98]"
+          >
+            Xem bảng giá
+          </Link>
+        )}
       </div>
       {products.length > 0 && (
         <p className="mt-10 text-base text-ink-600">
@@ -65,7 +67,7 @@ export default async function HomePage() {
         )}
       </section>
 
-      {categories.length > 0 && (
+      {hasPriceSheet && (
         <section id="bang-gia" aria-labelledby="bang-gia-title" className="mt-32 scroll-mt-20 bg-green-100 py-20 sm:mt-44 sm:py-28">
           <div className="mx-auto grid max-w-6xl gap-12 px-4 sm:px-6 md:grid-cols-[5fr_7fr] md:gap-14 lg:px-8">
             <div className="md:sticky md:top-24 md:self-start">
@@ -76,7 +78,7 @@ export default async function HomePage() {
               </Reveal>
               <Reveal delay={80}>
                 <p className="mt-5 max-w-[38ch] text-lg">
-                  Giá niêm yết theo từng quy cách, mua bao nhiêu tính bấy nhiêu. {SHIPPING_NOTE}.
+                  Giá theo từng quy cách. {SHIPPING_NOTE}.
                 </p>
               </Reveal>
               <Reveal delay={160} as="figure" className="mt-10 hidden md:block">
@@ -92,42 +94,6 @@ export default async function HomePage() {
           </div>
         </section>
       )}
-
-      <section aria-labelledby="nau-gao" className="mx-auto mt-32 grid max-w-6xl items-center gap-12 px-4 sm:mt-44 sm:px-6 md:grid-cols-2 md:gap-16 lg:px-8">
-        <div>
-          <Reveal>
-            <h2 id="nau-gao" className="text-[clamp(1.9rem,3.4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance">
-              Nấu gạo lứt cho cơm mềm
-            </h2>
-          </Reveal>
-          <Reveal delay={80}>
-            <p className="mt-4 max-w-[46ch] text-lg">Gạo lứt còn lớp cám nên cần nhiều nước và thời gian hơn gạo trắng. Cách nấu quen thuộc ở nhà:</p>
-          </Reveal>
-          <ol className="mt-8 space-y-5 text-lg">
-            {[
-              'Vo nhẹ một lần cho sạch bụi, không chà mạnh để giữ lớp cám.',
-              'Ngâm 4–8 tiếng, hoặc qua đêm, với nước sạch.',
-              'Nấu với lượng nước gấp 1,5 đến 2 lần gạo, thêm một nhúm muối.',
-              'Cơm chín thì ủ thêm 10–15 phút rồi mới xới.',
-            ].map((step, i) => (
-              <Reveal key={step} as="li" delay={140 + i * 70} className="flex gap-4">
-                <span aria-hidden="true" className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-honey-400 text-base font-semibold tabular-nums">
-                  {i + 1}
-                </span>
-                <span>{step}</span>
-              </Reveal>
-            ))}
-          </ol>
-          <Reveal delay={420}>
-            <p className="mt-8 max-w-[46ch] text-lg">
-              Nồi áp suất rút còn khoảng 30 phút. Gạo lứt đỏ, đen và trắng đều nấu được theo cách này.
-            </p>
-          </Reveal>
-        </div>
-        <Reveal delay={120}>
-          <GrainField />
-        </Reveal>
-      </section>
 
       <div className="mx-auto mt-24 max-w-6xl px-4 sm:px-6 lg:px-8">
         <p className="max-w-3xl text-base leading-relaxed text-ink-800">
