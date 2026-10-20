@@ -4,7 +4,7 @@ Plan: [plans/2026-10-19-hat-lanh.md](plans/2026-10-19-hat-lanh.md) (22 task). Nh
 
 ## Điểm dừng
 
-**Dừng sau Task 15 (Cart and checkout).** Không làm tiếp Task 16 trở đi cho đến khi có yêu cầu.
+Đã xong Task 17 (Blog và about). Task 18 trở đi (admin, báo cáo, smoke) chưa làm.
 
 | Task | Nội dung | Trạng thái | Commit |
 |---|---|---|---|
@@ -23,10 +23,13 @@ Plan: [plans/2026-10-19-hat-lanh.md](plans/2026-10-19-hat-lanh.md) (22 task). Nh
 | 13 | Portal foundation | xong | 57c5b69 |
 | 14 | Catalog và product detail | xong | 72d45f6, fbb72ac |
 | 15 | Cart và checkout | xong | 5e2b887 |
-| 16–22 | Account, blog, admin, reports, smoke | chưa làm | |
+| 16 | Account, orders, returns, reviews | xong | 2d2f887 |
+| 17 | Blog và about | xong | (commit Task 17) |
+| 18–22 | Admin, reports, smoke | chưa làm | |
 
 ## Làm tiếp
-Bắt đầu từ **Task 16: Account, orders, returns, reviews**.
+Bắt đầu từ **Task 18: Admin foundation và login**.
 
 ## Ghi chú
-- Sau commit Task 15 còn chỉnh sửa chưa commit ở `CartView.tsx`, `CheckoutView.tsx`, `checkout.ts`, `checkout.test.ts` (cải thiện a11y thông báo xóa/giảm số lượng, logic checkout). Xem `git diff` trước khi tiếp tục.
+- Trang `ve-chung-toi` còn các chỗ giữ chỗ `[Điền …]` để chủ shop tự điền.
+- Chưa kiểm tra bằng trình duyệt luồng bình luận khi đã đăng nhập (API có test e2e).
