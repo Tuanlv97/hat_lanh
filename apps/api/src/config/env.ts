@@ -1,10 +1,13 @@
 import { z } from 'zod';
 
+const DEV_JWT_SECRET = 'dev-only-jwt-secret-change-me';
+
 const schema = z.object({
   NODE_ENV: z.string().default('development'),
   PORT: z.coerce.number().int().positive().default(3000),
   DATABASE_URL: z.string().min(1).default('postgresql://hatlanh:hatlanh@localhost:5432/hat_lanh'),
-  JWT_SECRET: z.string().min(8).default('dev-only-jwt-secret-change-me'),
+  JWT_SECRET: z.string().min(8).default(DEV_JWT_SECRET),
+  /** Fake social login (POST /auth/dev-login) is enabled ONLY when this is explicitly 'dev'. */
   OAUTH_MODE: z.enum(['dev', 'live']).optional(),
   /** Per-IP limit per minute for POST /auth/login and /auth/register (global default stays 300/min). */
   AUTH_RATE_LIMIT: z.coerce.number().int().positive().default(10),
@@ -30,13 +33,16 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
   }
   const e = parsed.data;
   const production = e.NODE_ENV === 'production';
-  if (production && !source.JWT_SECRET) throw new Error('Invalid environment: JWT_SECRET is required in production');
+  if (production && (!source.JWT_SECRET || e.JWT_SECRET === DEV_JWT_SECRET)) {
+    throw new Error('Invalid environment: JWT_SECRET is required in production and must not be the dev default');
+  }
   return {
     nodeEnv: e.NODE_ENV,
     port: e.PORT,
     databaseUrl: e.DATABASE_URL,
     jwtSecret: e.JWT_SECRET,
-    oauthMode: e.OAUTH_MODE ?? (production ? 'live' : 'dev'),
+    // Unset means 'live' (dev-login hidden) in every environment: it must be opted into explicitly.
+    oauthMode: e.OAUTH_MODE ?? 'live',
     authRateLimit: e.AUTH_RATE_LIMIT,
     corsOrigins: e.CORS_ORIGINS.split(',')
       .map((s) => s.trim())

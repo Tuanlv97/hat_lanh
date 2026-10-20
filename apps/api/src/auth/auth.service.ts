@@ -144,7 +144,17 @@ export class AuthService {
             data: { name: input.name, email, provider: input.provider, providerId: input.providerId, emailVerified: true },
             select: AUTH_USER_SELECT,
           })
-          .catch(mapUniqueError);
+          .catch(async (err: unknown) => {
+            // Concurrent first sign-in: the other request created this exact social user first -> use it.
+            if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+              const winner = await this.prisma.user.findUnique({
+                where: { provider_providerId: { provider: input.provider, providerId: input.providerId } },
+                select: AUTH_USER_SELECT,
+              });
+              if (winner) return winner;
+            }
+            return mapUniqueError(err);
+          });
       }
     }
     if (user.email) await this.claimGuestOrders(user.id, user.email);

@@ -28,6 +28,7 @@ describe('seed', () => {
   });
 
   afterAll(async () => {
+    await resetDb(prisma);
     await prisma.$disconnect();
   });
 

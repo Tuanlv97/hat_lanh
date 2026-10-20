@@ -163,6 +163,25 @@ describe('Auth (e2e)', () => {
       expect(await prisma.user.count()).toBe(0);
     });
 
+    it('returns 404 when OAUTH_MODE is unset (dev-login must be opted into explicitly)', async () => {
+      delete process.env.OAUTH_MODE;
+      const res = await http()
+        .post('/auth/dev-login')
+        .send({ provider: 'google', email: 'g@x.com', name: 'G' })
+        .expect(404);
+      expect(res.body).toMatchObject({ statusCode: 404, error: 'NOT_FOUND' });
+      expect(await prisma.user.count()).toBe(0);
+    });
+
+    it('concurrent first-time dev-logins for the same email resolve to one user (no 409/500)', async () => {
+      process.env.OAUTH_MODE = 'dev';
+      const body = { provider: 'google', email: 'race@x.com', name: 'Race' };
+      const results = await Promise.all(Array.from({ length: 5 }, () => http().post('/auth/dev-login').send(body)));
+      expect(results.map((r) => r.status)).toEqual([200, 200, 200, 200, 200]);
+      expect(new Set(results.map((r) => r.body.user.id)).size).toBe(1);
+      expect(await prisma.user.count()).toBe(1);
+    });
+
     it('creates a verified social user, is idempotent, and links earlier guest orders with the same email', async () => {
       process.env.OAUTH_MODE = 'dev';
       const guest = await createGuestOrder(prisma, 'Social@X.com', 'HL-GUEST1');
