@@ -2,10 +2,16 @@
   "name": "hat-lanh",
   "version": "0.0.0",
   "private": true,
-  "workspaces": ["apps/api", "apps/portal", "apps/admin", "packages/shared"],
+  "workspaces": [
+    "apps/api",
+    "apps/portal",
+    "apps/admin",
+    "packages/shared"
+  ],
   "scripts": {
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",
-    "dev": "npm run dev --workspaces --if-present"
+    "dev": "npm run dev --workspaces --if-present",
+    "build:shared": "npm run build -w @hatlanh/shared"
   }
 }
