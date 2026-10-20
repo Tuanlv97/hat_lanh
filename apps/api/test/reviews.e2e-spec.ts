@@ -128,6 +128,18 @@ describe('Reviews (e2e)', () => {
       await t.http().get(`/products/${p.id}/reviews`).set(t.bearer('garbage')).expect(401);
     });
 
+    it('marks the viewer own review with mine=true (false for others and for anonymous)', async () => {
+      const p = await mkProduct();
+      await t.prisma.review.create({ data: { userId: t.userId, productId: p.id, rating: 5, content: 'của tôi' } });
+      await t.prisma.review.create({ data: { userId: t.otherId, productId: p.id, rating: 4, content: 'người khác' } });
+      const mine = await t.http().get(`/products/${p.id}/reviews`).set(t.bearer(t.userToken)).expect(200);
+      const byContent = Object.fromEntries(mine.body.map((r: { content: string; mine: boolean }) => [r.content, r.mine]));
+      expect(byContent).toEqual({ 'của tôi': true, 'người khác': false });
+      const anon = await t.http().get(`/products/${p.id}/reviews`).expect(200);
+      expect(anon.body.every((r: { mine: boolean }) => r.mine === false)).toBe(true);
+      expect(JSON.stringify(anon.body)).not.toContain(t.userId);
+    });
+
     it('404 for an unknown product', async () => {
       await t.http().get('/products/nope/reviews').expect(404);
     });

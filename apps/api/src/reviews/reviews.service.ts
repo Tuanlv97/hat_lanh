@@ -62,6 +62,8 @@ export class ReviewsService {
       status: r.status,
       createdAt: r.createdAt,
       authorName: r.user.name,
+      // Lets the author's UI know they already reviewed this product; no user id is exposed.
+      mine: viewerId !== undefined && r.userId === viewerId,
     }));
   }
 }

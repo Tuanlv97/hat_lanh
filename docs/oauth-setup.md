@@ -5,7 +5,8 @@
 API có `POST /auth/dev-login` nhận `{ provider: "google" | "facebook", email, name }` và tạo/đăng nhập tài khoản, không qua Google/Facebook thật. Endpoint này **chỉ bật khi `OAUTH_MODE=dev`** trong `.env`. Nếu không đặt biến này (hoặc đặt `live`) thì endpoint trả 404.
 
 - Máy local: `.env.example` đã có `OAUTH_MODE=dev`.
-- **Production: phải tắt** (xóa dòng `OAUTH_MODE` hoặc đặt `OAUTH_MODE=live`). Nếu để `dev`, ai cũng đăng nhập được bằng bất kỳ email nào.
+- Portal: `NEXT_PUBLIC_OAUTH_MODE=dev` làm nút Google/Facebook ở trang đăng nhập mở form "Đăng nhập thử (chế độ phát triển)" gọi endpoint này; không đặt thì nút hiện "Sắp có" và bị vô hiệu. Biến này gắn vào lúc build portal.
+- **Production: phải tắt** cả hai (`OAUTH_MODE` và `NEXT_PUBLIC_OAUTH_MODE`) (xóa dòng `OAUTH_MODE` hoặc đặt `OAUTH_MODE=live`). Nếu để `dev`, ai cũng đăng nhập được bằng bất kỳ email nào.
 
 ## Sau này: đăng nhập thật
 

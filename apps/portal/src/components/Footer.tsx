@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { NAV_LINKS, SHIPPING_NOTE, SHOP_BLURB, SHOP_NAME } from '@/lib/site';
+import { FooterAccountLinks } from './FooterAccountLinks';
 import { LogoMark } from './Logo';
 
 export function Footer() {
@@ -28,17 +29,7 @@ export function Footer() {
 
           <div>
             <h2 className="text-base font-semibold">Tài khoản</h2>
-            <ul className="mt-3 space-y-1">
-              <li>
-                <Link href="/gio-hang" className="inline-flex min-h-10 items-center hover:underline underline-offset-4">Giỏ hàng</Link>
-              </li>
-              <li>
-                <Link href="/dang-nhap" className="inline-flex min-h-10 items-center hover:underline underline-offset-4">Đăng nhập</Link>
-              </li>
-              <li>
-                <Link href="/tai-khoan/don-hang" className="inline-flex min-h-10 items-center hover:underline underline-offset-4">Đơn hàng của tôi</Link>
-              </li>
-            </ul>
+            <FooterAccountLinks />
           </div>
         </div>
 

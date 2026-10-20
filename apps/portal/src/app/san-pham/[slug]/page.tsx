@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Gallery } from '@/components/product/Gallery';
+import { ReviewEntry } from '@/components/product/ReviewEntry';
 import { Stars } from '@/components/product/Stars';
 import { VariantPicker } from '@/components/product/VariantPicker';
 import { Reveal } from '@/components/Reveal';
@@ -132,6 +133,7 @@ export default async function ProductPage({ params }: { params: Params }) {
             ) : (
               <p className="mt-4 max-w-[34ch] text-lg">Chưa có đánh giá. Khách đã mua và nhận hàng có thể đánh giá sản phẩm này.</p>
             )}
+            <ReviewEntry productId={p.id} />
           </div>
 
           {p.reviews.length > 0 ? (

@@ -52,6 +52,7 @@ npm run dev -w @hatlanh/api
 | `CORS_ORIGINS` | Các địa chỉ web được gọi API, cách nhau bằng dấu phẩy |
 | `API_URL` | Địa chỉ API mà portal gọi khi render phía server (mặc định `http://localhost:3000`) |
 | `NEXT_PUBLIC_API_URL` | Địa chỉ API mà trình duyệt gọi (mặc định `http://localhost:3000`; được gắn vào lúc build portal) |
+| `NEXT_PUBLIC_OAUTH_MODE` | `dev`: nút Google/Facebook ở portal mở form đăng nhập thử (gọi `/auth/dev-login`, cần `OAUTH_MODE=dev`); không đặt: nút hiện "Sắp có". Gắn vào lúc build; production không đặt `dev` |
 
 ## Lệnh
 
@@ -90,7 +91,7 @@ Các đường dẫn `/admin/*` yêu cầu đăng nhập admin. "Đăng nhập" 
 - **catalog**: `GET /categories`, `GET /products`, `GET /products/:slug`; admin: `GET|POST /admin/products`, `PATCH /admin/products/:id`, `PATCH /admin/products/:id/hide`, `POST /admin/products/:id/variants`, `PATCH|DELETE /admin/variants/:id`
 - **orders**: `POST /orders` (khách vãng lai hoặc đã đăng nhập), `GET /orders/lookup` (mã đơn + số điện thoại, 5 lần/phút), `GET /me/orders` (đăng nhập); admin: `GET /admin/orders`, `GET /admin/orders/:id`, `PATCH /admin/orders/:id/status`
 - **returns**: `POST /me/orders/:code/returns` (đăng nhập); admin: `GET|POST /admin/returns`, `PATCH /admin/returns/:id/decision`
-- **reviews**: `GET|POST /products/:id/reviews` (đăng bài cần đăng nhập)
+- **reviews**: `GET|POST /products/:id/reviews` (đăng bài cần đăng nhập; danh sách có cờ `mine` cho đánh giá của chính người xem)
 - **posts / topics**: `GET /posts`, `GET /posts/:slug`, `GET /topics`; admin: `GET|POST /admin/posts`, `GET|PATCH|DELETE /admin/posts/:id`, `GET|POST /admin/topics`, `PATCH|DELETE /admin/topics/:id`
 - **comments**: `GET|POST /posts/:slug/comments` (đăng bình luận cần đăng nhập)
 - **moderation**: admin `GET /admin/moderation`, `PATCH|DELETE /admin/moderation/:kind/:id`, `GET|POST /admin/sensitive-words`, `DELETE /admin/sensitive-words/:id`

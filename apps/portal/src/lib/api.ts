@@ -8,13 +8,16 @@ export class ApiError extends Error {
   readonly status: number;
   readonly error: string;
   readonly fields?: Record<string, string>;
+  /** Other keys of the error body (e.g. `remaining` on RETURN_QUANTITY_EXCEEDED). */
+  readonly details?: Record<string, unknown>;
 
-  constructor(status: number, error: string, message: string, fields?: Record<string, string>) {
+  constructor(status: number, error: string, message: string, fields?: Record<string, string>, details?: Record<string, unknown>) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.error = error;
     this.fields = fields;
+    this.details = details;
   }
 }
 
@@ -87,7 +90,8 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
       typeof obj.message === 'string' ? obj.message : typeof body === 'string' && body ? body : res.statusText || error;
     const fields =
       obj.fields && typeof obj.fields === 'object' ? (obj.fields as Record<string, string>) : undefined;
-    throw new ApiError(res.status, error, message, fields);
+    const { statusCode: _s, error: _e, message: _m, fields: _f, ...rest } = obj;
+    throw new ApiError(res.status, error, message, fields, Object.keys(rest).length > 0 ? rest : undefined);
   }
   return body as T;
 }

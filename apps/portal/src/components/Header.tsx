@@ -85,10 +85,17 @@ export function Header() {
           <div className={`hidden items-center gap-1 md:flex ${ready ? '' : 'invisible'}`}>
             {user ? (
               <>
-                <Link href="/tai-khoan/don-hang" className="max-w-40 truncate rounded-full px-3 py-2 text-sm font-medium hover:bg-green-100" title={user.name}>
+                <span className="hidden max-w-36 truncate px-2 text-sm text-ink-600 lg:inline" title={user.name}>
                   {user.name}
+                </span>
+                <Link
+                  href="/tai-khoan/don-hang"
+                  aria-current={isActive(pathname, '/tai-khoan/don-hang') ? 'page' : undefined}
+                  className={`inline-flex h-11 items-center rounded-full px-3 text-sm font-medium transition-colors duration-200 ${isActive(pathname, '/tai-khoan/don-hang') ? 'bg-green-100' : 'hover:bg-green-100'}`}
+                >
+                  Đơn hàng của tôi
                 </Link>
-                <button type="button" onClick={logout} className="cursor-pointer rounded-full px-3 py-2 text-sm text-ink-600 transition-colors duration-200 hover:bg-green-100 hover:text-ink-800">
+                <button type="button" onClick={logout} className="h-11 cursor-pointer rounded-full px-3 text-sm text-ink-600 transition-colors duration-200 hover:bg-green-100 hover:text-ink-800">
                   Đăng xuất
                 </button>
               </>
@@ -132,8 +139,15 @@ export function Header() {
           <div className="mt-3 flex flex-wrap items-center gap-2 px-1 pb-1">
             {user ? (
               <>
-                <Link href="/tai-khoan/don-hang" className="flex min-h-11 items-center rounded-full bg-surface px-4 font-medium">
-                  {user.name}
+                <p className="w-full px-3 text-base text-ink-600">
+                  Đang đăng nhập: <span className="font-medium text-ink-800">{user.name}</span>
+                </p>
+                <Link
+                  href="/tai-khoan/don-hang"
+                  aria-current={isActive(pathname, '/tai-khoan/don-hang') ? 'page' : undefined}
+                  className="flex min-h-11 items-center rounded-full bg-surface px-4 font-medium"
+                >
+                  Đơn hàng của tôi
                 </Link>
                 <button type="button" onClick={logout} className="min-h-11 cursor-pointer rounded-full px-4 text-ink-800 hover:bg-surface">
                   Đăng xuất

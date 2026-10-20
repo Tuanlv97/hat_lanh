@@ -60,6 +60,17 @@ describe('api()', () => {
     });
   });
 
+  it('keeps extra error details (e.g. remaining) from the body', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        jsonResponse(400, { statusCode: 400, error: 'RETURN_QUANTITY_EXCEEDED', message: 'x', orderItemId: 'oi1', remaining: 1 }),
+      ),
+    );
+    const err = await api('/me/orders/HL1/returns', { method: 'POST', body: '{}' }).catch((e: unknown) => e);
+    expect(err).toMatchObject({ status: 400, error: 'RETURN_QUANTITY_EXCEEDED', details: { orderItemId: 'oi1', remaining: 1 } });
+  });
+
   it('clears the stored token on 401', async () => {
     storage.setItem(TOKEN_KEY, 'stale');
     vi.stubGlobal(
