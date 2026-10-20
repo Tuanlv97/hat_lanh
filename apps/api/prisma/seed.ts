@@ -11,7 +11,7 @@ import { sensitiveWords } from './seed-data/words';
 export const ADMIN_EMAIL = 'admin@hatlanh.local';
 const DEFAULT_ADMIN_PASSWORD = 'ChangeMe123!';
 
-async function seedAdmin(prisma: PrismaClient): Promise<void> {
+export async function seedAdmin(prisma: PrismaClient): Promise<void> {
   const password = process.env.ADMIN_PASSWORD || DEFAULT_ADMIN_PASSWORD;
   const existing = await prisma.user.findUnique({ where: { email: ADMIN_EMAIL } });
   if (existing) {

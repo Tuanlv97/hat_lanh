@@ -19,6 +19,10 @@ export async function createTestApp(): Promise<INestApplication> {
 export async function resetDb(prisma?: PrismaClient): Promise<void> {
   const client = prisma ?? new PrismaClient();
   try {
+    const [{ db }] = await client.$queryRaw<{ db: string }[]>`SELECT current_database() AS db`;
+    if (!db.endsWith('_test')) {
+      throw new Error(`resetDb refused: connected database "${db}" does not end with "_test"`);
+    }
     const rows = await client.$queryRaw<{ tablename: string }[]>`
       SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename <> '_prisma_migrations'`;
     if (rows.length > 0) {

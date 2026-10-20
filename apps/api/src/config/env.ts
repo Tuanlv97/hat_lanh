@@ -6,6 +6,8 @@ const schema = z.object({
   DATABASE_URL: z.string().min(1).default('postgresql://hatlanh:hatlanh@localhost:5432/hat_lanh'),
   JWT_SECRET: z.string().min(8).default('dev-only-jwt-secret-change-me'),
   OAUTH_MODE: z.enum(['dev', 'live']).optional(),
+  /** Per-IP limit per minute for POST /auth/login and /auth/register (global default stays 300/min). */
+  AUTH_RATE_LIMIT: z.coerce.number().int().positive().default(10),
   CORS_ORIGINS: z.string().default('http://localhost:3001,http://localhost:3002'),
 });
 
@@ -16,6 +18,7 @@ export interface Env {
   jwtSecret: string;
   oauthMode: 'dev' | 'live';
   corsOrigins: string[];
+  authRateLimit: number;
 }
 
 /** Reads and validates environment variables (call lazily so tests can set them first). */
@@ -34,6 +37,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     databaseUrl: e.DATABASE_URL,
     jwtSecret: e.JWT_SECRET,
     oauthMode: e.OAUTH_MODE ?? (production ? 'live' : 'dev'),
+    authRateLimit: e.AUTH_RATE_LIMIT,
     corsOrigins: e.CORS_ORIGINS.split(',')
       .map((s) => s.trim())
       .filter(Boolean),
