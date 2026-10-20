@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: hatlanh-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-hatlanh}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hatlanh}
+      POSTGRES_DB: ${POSTGRES_DB:-hat_lanh}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hatlanh -d hat_lanh"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+volumes:
+  pgdata:

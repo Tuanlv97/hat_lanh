@@ -1,0 +1,8 @@
+{
+  "name": "@hatlanh/api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node -e \"console.log('@hatlanh/api: placeholder dev script')\""
+  }
+}
