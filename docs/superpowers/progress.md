@@ -4,7 +4,7 @@ Plan: [plans/2026-10-19-hat-lanh.md](plans/2026-10-19-hat-lanh.md) (22 task). Nh
 
 ## Điểm dừng
 
-Đã xong Task 18 (Admin foundation). Task 19 trở đi (màn hình admin, báo cáo, smoke) chưa làm.
+Đã xong Task 19. Task 20 trở đi (blog/kiểm duyệt/người dùng, báo cáo, smoke) chưa làm.
 
 | Task | Nội dung | Trạng thái | Commit |
 |---|---|---|---|
@@ -25,12 +25,14 @@ Plan: [plans/2026-10-19-hat-lanh.md](plans/2026-10-19-hat-lanh.md) (22 task). Nh
 | 15 | Cart và checkout | xong | 5e2b887 |
 | 16 | Account, orders, returns, reviews | xong | 2d2f887 |
 | 17 | Blog và about | xong | a279061 |
-| 18 | Admin foundation và login | xong | (commit Task 18) |
-| 19–22 | Admin screens, reports, smoke | chưa làm | |
+| 18 | Admin foundation và login | xong | 387bbff |
+| 19 | Admin: products, orders, returns | xong | (commit Task 19) |
+| 20–22 | Admin blog/moderation/users, reports, smoke | chưa làm | |
 
 ## Làm tiếp
-Bắt đầu từ **Task 19: Products, orders, returns screens**.
+Bắt đầu từ **Task 20: Blog, moderation, users screens**.
 
 ## Ghi chú
 - Trang `ve-chung-toi` còn các chỗ giữ chỗ `[Điền …]` để chủ shop tự điền.
 - Chưa kiểm tra bằng trình duyệt luồng bình luận khi đã đăng nhập (API có test e2e).
+- Admin (Task 19) chưa được click thử trên trình duyệt; đã kiểm tra bằng tsc, build và gọi các API mà màn hình dùng.
