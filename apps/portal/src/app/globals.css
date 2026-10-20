@@ -54,6 +54,60 @@ body {
   border-radius: 0.5rem;
 }
 
+/* Entrance used by <Reveal>: only elements the script marked hidden ever move. */
+.reveal {
+  transition:
+    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal[data-reveal='hidden'] {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+/* Botanical plates crossfade like light shifting in a room. */
+.plate {
+  transition: opacity 1600ms ease-in-out;
+}
+
+/* Slow drift on the visible plate: the page's one moving picture. */
+@keyframes plate-drift {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+.plate-drift {
+  animation: plate-drift 14s ease-in-out infinite alternate;
+}
+
+/* Non-blocking "added to cart" note. */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.toast-in {
+  animation: toast-in 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal[data-reveal='hidden'] {
+    opacity: 1;
+    transform: none;
+  }
+  .plate-drift {
+    animation: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

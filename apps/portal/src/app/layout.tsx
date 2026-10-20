@@ -17,6 +17,8 @@ const beVietnam = Be_Vietnam_Pro({
 });
 
 export const metadata: Metadata = {
+  // Absolute base for Open Graph image and canonical URLs.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001'),
   title: { default: `${SHOP_NAME} — ${SHOP_TAGLINE}`, template: `%s · ${SHOP_NAME}` },
   description: SHOP_BLURB,
 };

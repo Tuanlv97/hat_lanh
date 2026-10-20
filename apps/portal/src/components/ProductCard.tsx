@@ -9,12 +9,12 @@ export type ProductCardProps = {
   priceFrom: number;
   /** Image URL; falls back to the bundled placeholder for the slug. */
   image?: string | null;
-  /** More than one variant: show "Từ" before the price. */
+  /** Several variants at different prices: show "Từ" before the price. Callers pass `hasPriceRange(variants)`. */
   multipleVariants?: boolean;
   outOfStock?: boolean;
 };
 
-export function ProductCard({ slug, name, priceFrom, image, multipleVariants = true, outOfStock = false }: ProductCardProps) {
+export function ProductCard({ slug, name, priceFrom, image, multipleVariants = false, outOfStock = false }: ProductCardProps) {
   const src = image ? assetUrl(image) : `/placeholder/${slug}.svg`;
   return (
     <Link href={`/san-pham/${slug}`} className="group flex flex-col gap-3 rounded-[var(--radius-softer)] p-2 -m-2 transition-colors duration-200 hover:bg-green-100/60">
