@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ModerationService } from '../moderation/moderation.service';
+import { publishedWhere } from '../posts/post-visibility';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -12,7 +13,7 @@ export class CommentsService {
   /** A post is open to comments/reads only when PUBLISHED with publishAt null or already past. */
   private async requirePublishedPost(slug: string) {
     const post = await this.prisma.post.findFirst({
-      where: { slug, status: 'PUBLISHED', OR: [{ publishAt: null }, { publishAt: { lte: new Date() } }] },
+      where: { slug, ...publishedWhere() },
       select: { id: true },
     });
     if (!post) throw new NotFoundException({ statusCode: 404, error: 'NOT_FOUND', message: 'Không tìm thấy bài viết' });

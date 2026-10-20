@@ -5,6 +5,7 @@ import { AddressModule } from './address/address.module';
 import { AuthModule } from './auth/auth.module';
 import { CommentsModule } from './comments/comments.module';
 import { ModerationModule } from './moderation/moderation.module';
+import { PostsModule } from './posts/posts.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { UploadsModule } from './uploads/uploads.module';
@@ -31,6 +32,7 @@ import { UsersModule } from './users/users.module';
     ModerationModule,
     ReviewsModule,
     CommentsModule,
+    PostsModule,
   ],
   controllers: [HealthController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
