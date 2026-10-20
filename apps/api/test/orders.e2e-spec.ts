@@ -230,6 +230,17 @@ describe('Orders (e2e)', () => {
       expect(Object.keys(res.body.fields)).toEqual(expect.arrayContaining(['phone', 'email', 'fullName']));
     });
 
+    it('over-long addressDetail (301 chars) -> 400 on that field, no stock change, no order', async () => {
+      const v = await mkVariant({ stock: 4 });
+      const res = await http()
+        .post('/orders')
+        .send({ ...form, addressDetail: 'x'.repeat(301), items: [{ variantId: v.id, quantity: 1 }] })
+        .expect(400);
+      expect(res.body).toMatchObject({ error: 'VALIDATION_ERROR', fields: { addressDetail: expect.any(String) } });
+      expect(await stockOf(v.id)).toBe(4);
+      expect(await prisma.order.count()).toBe(0);
+    });
+
     it('bad ward (or ward of another province) -> 400, no stock change', async () => {
       const v = await mkVariant({ stock: 4 });
       const r1 = await http()
