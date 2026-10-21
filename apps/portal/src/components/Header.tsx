@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useCartCount } from '@/lib/cart';
 import { NAV_LINKS } from '@/lib/site';
@@ -22,18 +22,29 @@ function BagIcon() {
 }
 
 function CartLink({ count }: { count: number }) {
+  const [bump, setBump] = useState(false);
+  const prev = useRef(count);
+  useEffect(() => {
+    if (count > prev.current) {
+      setBump(true);
+      const t = window.setTimeout(() => setBump(false), 450);
+      prev.current = count;
+      return () => window.clearTimeout(t);
+    }
+    prev.current = count;
+  }, [count]);
   const label = count > 0 ? `Giỏ hàng, ${count} sản phẩm` : 'Giỏ hàng, chưa có sản phẩm';
   return (
     <Link
       href="/gio-hang"
       aria-label={label}
-      className="relative inline-flex h-11 items-center gap-2 rounded-full bg-green-100 px-4 text-sm font-medium text-ink-800 transition-colors duration-200 hover:bg-green-500"
+      className="btn btn-soft relative h-11 min-h-11 gap-2 px-4 text-sm"
     >
       <BagIcon />
       <span className="hidden sm:inline">Giỏ hàng</span>
       <span
         aria-hidden="true"
-        className={`min-w-6 rounded-full px-1.5 text-center text-xs font-semibold leading-6 tabular-nums ${count > 0 ? 'bg-honey-400 text-ink-800' : 'bg-surface text-ink-600'}`}
+        className={`${bump ? 'bump' : ''} min-w-6 rounded-full px-1.5 text-center text-xs font-semibold leading-6 tabular-nums ${count > 0 ? 'bg-honey-400 text-ink-800' : 'bg-surface text-ink-600'}`}
       >
         {count}
       </span>
@@ -46,7 +57,15 @@ export function Header() {
   const { user, ready, logout } = useAuth();
   const count = useCartCount();
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const menuId = useId();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   // Close the mobile menu on navigation and on Escape.
   useEffect(() => setOpen(false), [pathname]);
@@ -58,12 +77,12 @@ export function Header() {
   }, [open]);
 
   const linkClass = (href: string) =>
-    `rounded-full px-4 py-2 text-[0.95rem] transition-colors duration-200 ${
-      isActive(pathname, href) ? 'bg-green-100 font-medium text-ink-800' : 'text-ink-800 hover:bg-green-100'
+    `nav-link px-4 py-2.5 text-[0.95rem] transition-colors duration-200 ${
+      isActive(pathname, href) ? 'font-semibold text-ink-800' : 'text-ink-800/85 hover:text-ink-800'
     }`;
 
   return (
-    <header className="sticky top-0 z-40 bg-bg">
+    <header className="site-header sticky top-0 z-40" data-scrolled={scrolled}>
       <div className="mx-auto flex h-18 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
         <Logo />
 
@@ -100,7 +119,7 @@ export function Header() {
                 </button>
               </>
             ) : (
-              <Link href="/dang-nhap" className="inline-flex h-11 items-center rounded-full bg-ink-800 px-5 text-sm font-medium text-bg transition-opacity duration-200 hover:opacity-90">
+              <Link href="/dang-nhap" className="btn btn-primary h-11 min-h-11 px-5 text-sm">
                 Đăng nhập
               </Link>
             )}
@@ -121,8 +140,8 @@ export function Header() {
         </div>
       </div>
 
-      <div id={menuId} hidden={!open} className="md:hidden">
-        <nav aria-label="Menu di động" className="mx-4 mb-4 rounded-[var(--radius-softer)] bg-green-100 p-3">
+      <div id={menuId} hidden={!open} className="menu-in md:hidden">
+        <nav aria-label="Menu di động" className="mx-4 mb-4 rounded-[var(--radius-softer)] bg-green-100 p-3 shadow-[var(--shadow-md)]">
           <ul className="flex flex-col">
             {NAV_LINKS.map((l) => (
               <li key={l.href}>
@@ -154,7 +173,7 @@ export function Header() {
                 </button>
               </>
             ) : (
-              <Link href="/dang-nhap" className="flex min-h-11 items-center rounded-full bg-ink-800 px-5 font-medium text-bg">
+              <Link href="/dang-nhap" className="flex min-h-11 items-center rounded-full bg-primary px-5 font-medium text-bg">
                 Đăng nhập
               </Link>
             )}

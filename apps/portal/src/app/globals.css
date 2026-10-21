@@ -1,21 +1,24 @@
 @import 'tailwindcss';
 
-/* Style B tokens (owner's choice). Text on green-500 / honey-400 is always ink-800 (6.1:1 / 7.0:1). */
 :root {
-  --green-500: #a8c3a0;
-  --green-100: #eaf1e6;
-  --honey-400: #e8c27a;
-  --ink-800: #2e3b33;
-  --bg: #fafaf7;
-  /* Derived: secondary text (5.4:1 on bg, 4.9:1 on green-100) and a deeper leaf for focus rings. */
-  --ink-600: #5a6b60;
-  --green-700: #4f7a52;
+  /* Theme: fresh leaf green + amber (2026-10 redesign). Contrast notes are against --bg. */
+  --primary: #15803d; /* buttons, selected chips; white text on it 5.0:1 */
+  --primary-strong: #166534;
+  --green-500: #86cfa0; /* hover fills and rings; ink-800 text on it 8.9:1 */
+  --green-100: #dcf2e3; /* soft blocks */
+  --honey-400: #f59e0b; /* amber accent; ink-800 text on it 7.0:1 */
+  --ink-800: #14321f; /* text, 13:1 */
+  --bg: #f3faf5;
+  --ink-600: #4b5e52; /* secondary text, 6.4:1 */
+  --green-700: #166534; /* focus rings, icons */
   --surface: #ffffff;
-  /* Form errors: 6.3:1 on bg, 5.7:1 on green-100; always paired with text, never colour alone. */
-  --error: #a3392b;
+  /* Form errors: always paired with text, never colour alone. */
+  --error: #b42318;
 }
 
 @theme inline {
+  --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
   --color-green-500: var(--green-500);
   --color-green-100: var(--green-100);
   --color-honey-400: var(--honey-400);
@@ -119,6 +122,123 @@ body {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
   }
+}
+
+/* ---------- Redesign: depth, buttons, motion ---------- */
+:root {
+  --shadow-sm: 0 1px 2px rgb(46 59 51 / 0.06), 0 2px 8px rgb(46 59 51 / 0.05);
+  --shadow-md: 0 4px 12px rgb(46 59 51 / 0.08), 0 12px 32px rgb(46 59 51 / 0.08);
+  --shadow-lg: 0 8px 24px rgb(46 59 51 / 0.1), 0 24px 56px rgb(46 59 51 / 0.12);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html { scroll-behavior: smooth; }
+
+@layer components {
+/* Buttons: one family so every call to action feels the same and gives feedback on press. */
+.btn {
+  display: inline-flex;
+  min-height: 3rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  padding: 0 1.5rem;
+  font-weight: 500;
+  transition:
+    transform 200ms var(--ease-out),
+    box-shadow 200ms var(--ease-out),
+    background-color 200ms,
+    filter 200ms;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.btn:active { transform: translateY(0) scale(0.98); box-shadow: var(--shadow-sm); }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-strong); }
+.btn-honey { background: var(--honey-400); color: var(--ink-800); }
+.btn-honey:hover { filter: brightness(1.05); }
+.btn-soft { background: var(--green-100); color: var(--ink-800); }
+.btn-soft:hover { background: var(--green-500); }
+.btn-lg { min-height: 3.25rem; padding: 0 2rem; font-size: 1.125rem; }
+
+/* Cards lift on hover (pointer devices only, so touch never gets a stuck hover). */
+.card-lift { transition: transform 300ms var(--ease-out), box-shadow 300ms var(--ease-out); box-shadow: var(--shadow-sm); }
+@media (hover: hover) {
+  .card-lift:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+}
+
+}
+
+/* Header: frosted, with a hairline that appears once the page scrolls. */
+.site-header {
+  background: rgb(243 250 245 / 0.82);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  backdrop-filter: saturate(1.4) blur(14px);
+  transition: box-shadow 250ms, background-color 250ms;
+}
+.site-header[data-scrolled='true'] { box-shadow: 0 1px 0 rgb(134 207 160 / 0.6), var(--shadow-sm); background: rgb(243 250 245 / 0.94); }
+
+/* Active nav link: a honey underline that grows in. */
+.nav-link { position: relative; }
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 1rem; right: 1rem; bottom: 0.2rem;
+  height: 3px; border-radius: 3px;
+  background: var(--honey-400);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 300ms var(--ease-out);
+}
+.nav-link:hover::after, .nav-link[aria-current='page']::after { transform: scaleX(1); }
+
+/* Cart count pops when the number changes. */
+@keyframes bump { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
+.bump { animation: bump 420ms var(--ease-out); }
+
+/* Mobile menu slides down. */
+@keyframes menu-in { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+.menu-in { animation: menu-in 260ms var(--ease-out); }
+
+/* Staggered entrance for hero copy: pure CSS, so it works before hydration. */
+@keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+.rise { animation: rise 700ms var(--ease-out) both; }
+.rise-1 { animation-delay: 80ms; }
+.rise-2 { animation-delay: 180ms; }
+.rise-3 { animation-delay: 280ms; }
+.rise-4 { animation-delay: 380ms; }
+
+/* Soft floating background shapes. */
+@keyframes float { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -18px, 0); } }
+.float-slow { animation: float 9s ease-in-out infinite; }
+.float-slower { animation: float 13s ease-in-out infinite reverse; }
+
+/* Tick that draws itself when something succeeds. */
+@keyframes draw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+.check-draw { stroke-dasharray: 24; animation: draw 380ms var(--ease-out) both; }
+
+/* Loading skeleton. */
+@keyframes shimmer { to { background-position: -200% 0; } }
+.skeleton {
+  background: linear-gradient(90deg, var(--green-100) 25%, #eefaf2 50%, var(--green-100) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: var(--radius-soft);
+}
+
+/* Subtle page-to-page fade. */
+@keyframes page-in { from { opacity: 0; } to { opacity: 1; } }
+main { animation: page-in 350ms ease-out; }
+
+/* Sticky mobile call to action respects the iOS home indicator. */
+.safe-bottom { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .check-draw, .rise, .float-slow, .float-slower, .menu-in, .bump, main { animation: none; }
+  .btn:hover, .card-lift:hover { transform: none; }
+  .skeleton { animation: none; }
 }
 
 /* Blog body: the API sanitizes to a small tag set (h2-h4, p, lists, quote, table, img), styled here. */

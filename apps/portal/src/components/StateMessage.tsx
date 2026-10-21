@@ -17,7 +17,7 @@ export function StateMessage({ title, body, action, role = 'status' }: StateMess
       {action && (
         <Link
           href={action.href}
-          className="mt-6 inline-flex h-12 items-center rounded-full bg-ink-800 px-6 font-medium text-bg transition-opacity duration-200 hover:opacity-90"
+          className="btn btn-primary mt-6"
         >
           {action.label}
         </Link>

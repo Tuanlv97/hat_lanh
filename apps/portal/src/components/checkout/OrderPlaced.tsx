@@ -42,7 +42,7 @@ export function OrderPlaced({ code, totalVnd }: { code: string; totalVnd: number
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href={`/tra-cuu-don?code=${encodeURIComponent(code)}`}
-              className="inline-flex h-13 items-center rounded-full bg-ink-800 px-7 text-lg font-medium text-bg transition-[opacity,transform] duration-200 hover:opacity-90 active:scale-[0.98]"
+              className="inline-flex h-13 items-center rounded-full bg-primary px-7 text-lg font-medium text-bg transition-[opacity,transform] duration-200 hover:opacity-90 active:scale-[0.98]"
             >
               Tra cứu đơn
             </Link>

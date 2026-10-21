@@ -79,7 +79,7 @@ export function CommentSection({ slug, path }: { slug: string; path: string }) {
             <button
               type="submit"
               disabled={pending}
-              className="mt-4 h-12 cursor-pointer rounded-full bg-ink-800 px-6 font-medium text-bg transition-[opacity,transform] duration-200 hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-4 h-12 cursor-pointer rounded-full bg-primary px-6 font-medium text-bg transition-[opacity,transform] duration-200 hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {pending ? 'Đang gửi…' : 'Gửi bình luận'}
             </button>

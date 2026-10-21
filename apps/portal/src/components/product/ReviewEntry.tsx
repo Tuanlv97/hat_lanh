@@ -46,7 +46,7 @@ export function ReviewEntry({ productId }: { productId: string }) {
     return (
       <Link
         href={entry.href}
-        className="mt-6 inline-flex h-12 items-center rounded-full bg-ink-800 px-6 font-medium text-bg transition-[opacity,transform] duration-200 hover:opacity-90 active:scale-[0.98]"
+        className="btn btn-primary mt-6"
       >
         Viết đánh giá
       </Link>

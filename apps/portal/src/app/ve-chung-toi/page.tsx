@@ -36,7 +36,7 @@ export default function AboutPage() {
         </section>
       </div>
 
-      <Link href="/san-pham" className="mt-12 inline-flex h-12 items-center rounded-full bg-ink-800 px-7 font-medium text-bg transition-opacity duration-200 hover:opacity-90">
+      <Link href="/san-pham" className="mt-12 inline-flex h-12 items-center rounded-full bg-primary px-7 font-medium text-bg transition-opacity duration-200 hover:opacity-90">
         Xem sản phẩm
       </Link>
     </div>

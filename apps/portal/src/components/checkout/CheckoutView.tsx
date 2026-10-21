@@ -232,7 +232,7 @@ export function CheckoutView() {
             {state.status === 'error' ? (
               <div className="mt-3">
                 <p className="text-base">Chưa tải được giá và tồn kho.</p>
-                <button type="button" onClick={() => void reload()} className="mt-2 inline-flex h-11 cursor-pointer items-center rounded-full bg-ink-800 px-5 font-medium text-bg hover:opacity-90">
+                <button type="button" onClick={() => void reload()} className="mt-2 inline-flex h-11 cursor-pointer items-center rounded-full bg-primary px-5 font-medium text-bg hover:opacity-90">
                   Thử lại
                 </button>
               </div>
@@ -364,7 +364,7 @@ export function CheckoutView() {
             type="submit"
             disabled={pending}
             aria-describedby={blocked ? 'dh-chan' : undefined}
-            className="mt-6 inline-flex h-14 w-full cursor-pointer items-center justify-center gap-3 rounded-full bg-ink-800 px-8 text-lg font-medium text-bg transition-[opacity,transform] duration-200 hover:opacity-90 active:scale-[0.98] disabled:cursor-wait disabled:opacity-70 disabled:active:scale-100 sm:w-auto"
+            className="mt-6 inline-flex h-14 w-full cursor-pointer items-center justify-center gap-3 rounded-full bg-primary px-8 text-lg font-medium text-bg transition-[opacity,transform] duration-200 hover:opacity-90 active:scale-[0.98] disabled:cursor-wait disabled:opacity-70 disabled:active:scale-100 sm:w-auto"
           >
             {pending && <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-bg border-t-transparent" />}
             {pending ? 'Đang gửi đơn…' : 'Gửi đơn hàng'}

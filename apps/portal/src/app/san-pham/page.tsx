@@ -41,8 +41,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: Sea
   const activeCat = categories.find((c) => c.slug === category);
 
   const chip = (on: boolean) =>
-    `inline-flex min-h-11 items-center rounded-full px-5 text-base transition-colors duration-200 ${
-      on ? 'bg-ink-800 font-medium text-bg' : 'bg-green-100 text-ink-800 hover:bg-green-500'
+    `inline-flex min-h-11 items-center rounded-full px-5 text-base transition-all duration-200 ${
+      on ? 'bg-primary font-medium text-bg shadow-[var(--shadow-sm)]' : 'bg-green-100 text-ink-800 hover:-translate-y-0.5 hover:bg-green-500'
     }`;
 
   return (
@@ -74,7 +74,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Sea
               maxLength={100}
               className="h-12 min-w-0 flex-1 rounded-full bg-surface px-5 text-base text-ink-800 ring-1 ring-green-500 placeholder:text-ink-600 focus:ring-2 focus:ring-green-700 focus:outline-none"
             />
-            <button type="submit" className="h-12 shrink-0 cursor-pointer rounded-full bg-ink-800 px-5 font-medium text-bg transition-[opacity,transform] duration-200 hover:opacity-90 active:scale-[0.98]">
+            <button type="submit" className="btn btn-primary shrink-0 px-5">
               Tìm
             </button>
           </div>

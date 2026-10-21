@@ -115,7 +115,7 @@ export function SubmitButton({ pending, label, pendingLabel, className = '' }: {
     <button
       type="submit"
       disabled={pending}
-      className={`inline-flex h-14 w-full cursor-pointer items-center justify-center gap-3 rounded-full bg-ink-800 px-8 text-lg font-medium text-bg transition-[opacity,transform] duration-200 hover:opacity-90 active:scale-[0.98] disabled:cursor-wait disabled:opacity-70 disabled:active:scale-100 ${className}`}
+      className={`inline-flex h-14 w-full cursor-pointer items-center justify-center gap-3 rounded-full bg-primary px-8 text-lg font-medium text-bg transition-[opacity,transform] duration-200 hover:opacity-90 active:scale-[0.98] disabled:cursor-wait disabled:opacity-70 disabled:active:scale-100 ${className}`}
     >
       {pending && <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-bg border-t-transparent" />}
       {pending ? pendingLabel : label}

@@ -23,8 +23,8 @@ const HOLD_MS = 6000;
  * choosing a group stops them, and hovering or focusing the plate pauses them (WCAG 2.2.2).
  */
 const pill = (on: boolean) =>
-  `inline-flex min-h-11 cursor-pointer items-center rounded-full px-5 text-lg transition-colors duration-200 active:scale-[0.98] ${
-    on ? 'bg-ink-800 font-medium text-bg' : 'bg-green-100 text-ink-800 hover:bg-green-500'
+  `inline-flex min-h-11 cursor-pointer items-center rounded-full px-5 text-lg transition-all duration-200 active:scale-[0.97] ${
+    on ? 'bg-primary font-medium text-bg shadow-[var(--shadow-sm)]' : 'bg-green-100 text-ink-800 hover:-translate-y-0.5 hover:bg-green-500'
   }`;
 
 export function HomeStage({ hero, categories }: HomeStageProps) {

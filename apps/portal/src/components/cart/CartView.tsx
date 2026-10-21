@@ -12,7 +12,7 @@ import { useCartCatalog } from '@/lib/use-cart-catalog';
 import { LineNotice, LineThumb } from './parts';
 
 const primaryBtn =
-  'inline-flex h-13 w-full cursor-pointer items-center justify-center rounded-full bg-ink-800 px-8 text-lg font-medium text-bg transition-[opacity,transform] duration-200 hover:opacity-90 active:scale-[0.98]';
+  'inline-flex h-13 w-full cursor-pointer items-center justify-center rounded-full bg-primary px-8 text-lg font-medium text-bg transition-[opacity,transform] duration-200 hover:opacity-90 active:scale-[0.98]';
 
 function Skeleton({ rows }: { rows: number }) {
   return (
@@ -141,7 +141,7 @@ export function CartView() {
             <div role="alert" className="rounded-[var(--radius-soft)] bg-green-100 p-6">
               <p className="text-lg font-medium">Chưa tải được giá và tồn kho.</p>
               <p className="mt-1 text-base">Giỏ hàng của bạn vẫn còn nguyên. Kiểm tra kết nối rồi thử lại nhé.</p>
-              <button type="button" onClick={() => void reload()} className="mt-4 inline-flex h-11 cursor-pointer items-center rounded-full bg-ink-800 px-5 font-medium text-bg hover:opacity-90">
+              <button type="button" onClick={() => void reload()} className="mt-4 inline-flex h-11 cursor-pointer items-center rounded-full bg-primary px-5 font-medium text-bg hover:opacity-90">
                 Thử lại
               </button>
             </div>

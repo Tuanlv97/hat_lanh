@@ -36,7 +36,7 @@ export default async function BlogPage({ searchParams }: { searchParams: SearchP
 
   const chip = (on: boolean) =>
     `inline-flex min-h-11 items-center rounded-full px-5 text-base transition-colors duration-200 ${
-      on ? 'bg-ink-800 font-medium text-bg' : 'bg-green-100 text-ink-800 hover:bg-green-500'
+      on ? 'bg-primary font-medium text-bg' : 'bg-green-100 text-ink-800 hover:bg-green-500'
     }`;
 
   return (

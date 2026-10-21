@@ -34,7 +34,7 @@ function MyOrders({ user }: { user: AuthUser }) {
           {state.status === 'error' && (
             <div role="alert" className="rounded-[var(--radius-softer)] bg-green-100 px-6 py-8">
               <p className="text-lg">Chưa tải được đơn hàng. Bạn kiểm tra mạng rồi thử lại nhé.</p>
-              <button type="button" onClick={() => void reload()} className="mt-4 inline-flex h-12 cursor-pointer items-center rounded-full bg-ink-800 px-6 font-medium text-bg hover:opacity-90">
+              <button type="button" onClick={() => void reload()} className="mt-4 inline-flex h-12 cursor-pointer items-center rounded-full bg-primary px-6 font-medium text-bg hover:opacity-90">
                 Thử lại
               </button>
             </div>

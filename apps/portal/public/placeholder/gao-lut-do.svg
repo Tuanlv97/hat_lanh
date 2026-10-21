@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" role="img" aria-label="Gạo lứt đỏ">
-  <rect width="600" height="600" rx="32" fill="#EAF1E6"/>
-  <circle cx="300" cy="250" r="120" fill="#A8C3A0"/>
-  <ellipse cx="300" cy="250" rx="34" ry="62" fill="#E8C27A" transform="rotate(-20 300 250)"/>
-  <ellipse cx="300" cy="250" rx="34" ry="62" fill="none" stroke="#2E3B33" stroke-width="3" opacity="0.35" transform="rotate(-20 300 250)"/>
-  <text x="300" y="440" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="44" font-weight="600" fill="#2E3B33">Gạo lứt đỏ</text>
-  <text x="300" y="490" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="22" fill="#2E3B33" opacity="0.6">Hạt Lành · ảnh minh họa</text>
+  <rect width="600" height="600" rx="32" fill="#DCF2E3"/>
+  <circle cx="300" cy="250" r="120" fill="#86CFA0"/>
+  <ellipse cx="300" cy="250" rx="34" ry="62" fill="#F59E0B" transform="rotate(-20 300 250)"/>
+  <ellipse cx="300" cy="250" rx="34" ry="62" fill="none" stroke="#14321F" stroke-width="3" opacity="0.35" transform="rotate(-20 300 250)"/>
+  <text x="300" y="440" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="44" font-weight="600" fill="#14321F">Gạo lứt đỏ</text>
+  <text x="300" y="490" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="22" fill="#14321F" opacity="0.6">Hạt Lành · ảnh minh họa</text>
 </svg>

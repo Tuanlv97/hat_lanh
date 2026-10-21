@@ -178,7 +178,7 @@ function ReviewForm({ productId, headingId, onDone }: { productId: string; headi
                 <label
                   htmlFor={id}
                   className={`inline-flex h-12 min-w-12 cursor-pointer items-center justify-center gap-1 rounded-full px-3 text-base font-medium transition-colors duration-200 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-green-700 ${
-                    rating === n ? 'bg-ink-800 text-bg' : on ? 'bg-honey-400 text-ink-800' : 'bg-surface text-ink-800 hover:bg-green-500'
+                    rating === n ? 'bg-primary text-bg' : on ? 'bg-honey-400 text-ink-800' : 'bg-surface text-ink-800 hover:bg-green-500'
                   }`}
                 >
                   <svg viewBox="0 0 20 20" className="h-4.5 w-4.5" fill="currentColor" aria-hidden="true">
